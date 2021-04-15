@@ -1,0 +1,8 @@
+function:
+  trigger:
+    type: azure-blob
+    blob:
+      blobContainerName: "new"
+      connection: STORAGE_CONNECTION_STRING
+blobstorage:
+  enabled: false
