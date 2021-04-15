@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.sendletter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@SuppressWarnings("HideUtilityClassConstructor") // Spring needs a constructor, its not a utility class
+@SuppressWarnings("HideUtilityClassConstructor")
 public class Application {
     private static final Logger LOGGER = LoggerFactory.getLogger(Application.class);
 
