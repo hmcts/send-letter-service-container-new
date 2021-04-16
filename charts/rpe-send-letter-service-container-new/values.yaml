@@ -1,8 +1,10 @@
 function:
   image: 'hmctspublic.azurecr.io/rpe/send-letter-service-container-new::latest'
-  envSourceContainerName:"new"
+  environment:
+    APPINSIGHTS_INSTRUMENTATIONKEY: 9be248a9-8d37-45e1-a078-11fa981a8393
   trigger:
     type: azure-blob
     blob:
       blobContainerName: "new"
-      connection: STORAGE_CONNECTION_STRING
+      connection: "dummy"
+
