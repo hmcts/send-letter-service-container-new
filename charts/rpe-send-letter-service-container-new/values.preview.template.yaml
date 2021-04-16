@@ -1,12 +1,3 @@
 function:
   # Don't modify below here
   image: ${IMAGE_NAME}
-
-blobstorage:
-  resourceGroup: rpe-send-letter-service-aks
-  teamName: "Software Engineering"
-  location: ukwest
-  setup:
-    containers:
-      - new
-  enabled: true

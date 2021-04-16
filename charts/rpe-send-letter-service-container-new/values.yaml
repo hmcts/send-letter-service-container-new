@@ -5,5 +5,3 @@ function:
     blob:
       blobContainerName: "new"
       connection: STORAGE_CONNECTION_STRING
-blobstorage:
-  enabled: false
