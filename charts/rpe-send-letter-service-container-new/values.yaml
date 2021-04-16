@@ -1,5 +1,6 @@
 function:
   image: 'hmctspublic.azurecr.io/rpe/send-letter-service-container-new::latest'
+  envSourceContainerName:"new"
   trigger:
     type: azure-blob
     blob:
