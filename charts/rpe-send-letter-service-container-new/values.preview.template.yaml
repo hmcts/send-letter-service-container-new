@@ -1,12 +1,6 @@
 function:
   # Don't modify below here
   image: ${IMAGE_NAME}
-  aadIdentityName: send-letter
-  keyVaults:
-    "rpe-send-letter":
-      secrets:
-        - name: ftp-user
-          alias: FTP_USER
   trigger:
     type: azure-blob
     blob:

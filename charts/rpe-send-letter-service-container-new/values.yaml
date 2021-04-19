@@ -1,7 +1,13 @@
 function:
   image: 'hmctspublic.azurecr.io/rpe/send-letter-service-container-new::latest'
+  aadIdentityName: send-letter
   environment:
     APPINSIGHTS_INSTRUMENTATIONKEY: 9be248a9-8d37-45e1-a078-11fa981a8393
+  keyVaults:
+    "rpe-send-letter":
+      secrets:
+        - name: ftp-user
+          alias: FTP_USER
   trigger:
     type: azure-blob
     blob:
