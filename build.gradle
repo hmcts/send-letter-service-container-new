@@ -185,8 +185,7 @@ ext.libraries = [
 ]
 
 dependencies {
-  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-batch'
-  implementation group: 'org.springframework.boot', name: 'spring-boot-configuration-processor'
+  implementation group: 'org.springframework.boot', name: 'spring-boot-starter'
 
   implementation group: 'uk.gov.hmcts.reform', name: 'logging', version: versions.reformLogging
   implementation group: 'uk.gov.hmcts.reform', name: 'logging-appinsights', version: versions.reformLogging
