@@ -6,4 +6,3 @@ function:
     type: azure-blob
     blob:
       blobContainerName: "new"
-      accountName: "dummy"
