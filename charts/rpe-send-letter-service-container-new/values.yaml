@@ -6,8 +6,8 @@ function:
   keyVaults:
     "rpe-send-letter":
       secrets:
-        - name: ftp-user
-          alias: FTP_USER
+        - name: storage-account-connection-string
+          alias: STORAGE_ACCOUNT_CONNECTION_STRING
   trigger:
     type: azure-blob
     blob:
