@@ -1,5 +1,5 @@
 function:
-  image: 'hmctspublic.azurecr.io/rpe/send-letter-service-container-new::latest'
+  image: 'hmctspublic.azurecr.io/rpe/send-letter-service-container-new:latest'
   aadIdentityName: send-letter
   environment:
     SEND_LETTER_URL: "http://rpe-send-letter-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
