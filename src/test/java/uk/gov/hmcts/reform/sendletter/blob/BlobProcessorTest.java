@@ -5,16 +5,16 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-public class BlobProcessorTest {
+class BlobProcessorTest {
     private BlobProcessor processBlob;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         processBlob = new BlobProcessor();
     }
 
     @Test
-    public void shouldProcessBlobWhenTriggered() {
+    void shouldProcessBlobWhenTriggered() {
         boolean processed = processBlob.read();
         assertThat(processed).isTrue();
     }
