@@ -9,7 +9,7 @@ class BlobProcessorTest {
     private BlobProcessor processBlob;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         processBlob = new BlobProcessor();
     }
 
@@ -18,5 +18,4 @@ class BlobProcessorTest {
         boolean processed = processBlob.read();
         assertThat(processed).isTrue();
     }
-
 }
