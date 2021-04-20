@@ -6,10 +6,10 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class BlobProcessor {
-    private static final Logger log = LoggerFactory.getLogger(BlobProcessor.class);
+    private static final Logger LOG = LoggerFactory.getLogger(BlobProcessor.class);
 
     public boolean read() {
-        log.info("Blob read");
+        LOG.info("Blob read");
         return true;
     }
 }
