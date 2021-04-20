@@ -1,3 +1,8 @@
 function:
   # Don't modify below here
   image: ${IMAGE_NAME}
+  trigger:
+    type: azure-blob
+    blob:
+      blobContainerName: "new"
+      accountName: "rpesendletterpreview"

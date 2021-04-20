@@ -1,8 +1,16 @@
 function:
+  image: 'hmctspublic.azurecr.io/rpe/send-letter-service-container-new::latest'
+  aadIdentityName: send-letter
+  environment:
+    SEND_LETTER_URL: "http://rpe-send-letter-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
+  keyVaults:
+    "rpe-send-letter":
+      secrets:
+        - name: storage-account-connection-string
+          alias: STORAGE_ACCOUNT_CONNECTION_STRING
+        - name: app-insights-instrumentation-key
+          alias: azure.application-insights.instrumentation-key
   trigger:
     type: azure-blob
     blob:
       blobContainerName: "new"
-      connection: STORAGE_CONNECTION_STRING
-blobstorage:
-  enabled: false
