@@ -5,4 +5,4 @@ function:
     type: azure-blob
     blob:
       blobContainerName: "new"
-      accountName: "sendletterpreview"
+      accountName: "rpesendletterpreview"
