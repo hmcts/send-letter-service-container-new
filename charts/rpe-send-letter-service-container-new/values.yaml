@@ -2,12 +2,14 @@ function:
   image: 'hmctspublic.azurecr.io/rpe/send-letter-service-container-new::latest'
   aadIdentityName: send-letter
   environment:
-    APPINSIGHTS_INSTRUMENTATIONKEY: 9be248a9-8d37-45e1-a078-11fa981a8393
+    SEND_LETTER_URL: "http://rpe-send-letter-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
   keyVaults:
     "rpe-send-letter":
       secrets:
         - name: storage-account-connection-string
           alias: STORAGE_ACCOUNT_CONNECTION_STRING
+        - name: app-insights-instrumentation-key
+          alias: azure.application-insights.instrumentation-key
   trigger:
     type: azure-blob
     blob:
