@@ -9,12 +9,12 @@ class BlobProcessorTest {
     private BlobProcessor processBlob;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         processBlob = new BlobProcessor();
     }
 
     @Test
-    void shouldProcessBlobWhenTriggered() {
+    void should_process_blob_when_triggered() {
         boolean processed = processBlob.read();
         assertThat(processed).isTrue();
     }
