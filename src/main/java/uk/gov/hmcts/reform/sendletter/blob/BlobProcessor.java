@@ -10,6 +10,12 @@ public class BlobProcessor {
 
     public boolean read() {
         LOG.info("About to read new blob");
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        LOG.info("done!");
         return true;
     }
 }
