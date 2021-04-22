@@ -14,6 +14,7 @@ public class BlobProcessor {
             Thread.sleep(10_000);
         } catch (InterruptedException e) {
             LOG.error("Exception", e);
+            Thread.currentThread().interrupt();
         }
         LOG.info("done!");
         return true;
