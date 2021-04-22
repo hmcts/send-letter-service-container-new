@@ -10,7 +10,7 @@ class BlobProcessorTest {
 
     @BeforeEach
     void setUp() {
-        processBlob = new BlobProcessor();
+        processBlob = new BlobProcessor("blobStorageConnection");
     }
 
     @Test

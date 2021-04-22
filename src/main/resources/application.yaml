@@ -1,0 +1,2 @@
+storage:
+  connection: ${STORAGE_ACCOUNT_CONNECTION_STRING:"dummy"}
