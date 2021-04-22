@@ -8,15 +8,9 @@ import org.springframework.stereotype.Service;
 public class BlobProcessor {
     private static final Logger LOG = LoggerFactory.getLogger(BlobProcessor.class);
 
-    public boolean read() {
+    public boolean read() throws InterruptedException {
         LOG.info("About to read new blob");
-        try {
-            Thread.sleep(10_000);
-        } catch (InterruptedException e) {
-            LOG.error("Exception", e);
-            Thread.currentThread().interrupt();
-        }
-        LOG.info("done!");
+        Thread.sleep(10_000);
         return true;
     }
 }

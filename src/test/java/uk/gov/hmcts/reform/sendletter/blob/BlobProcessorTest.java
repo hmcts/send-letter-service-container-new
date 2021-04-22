@@ -14,7 +14,7 @@ class BlobProcessorTest {
     }
 
     @Test
-    void should_process_blob_when_triggered() {
+    void should_process_blob_when_triggered() throws InterruptedException {
         boolean processed = processBlob.read();
         assertThat(processed).isTrue();
     }
