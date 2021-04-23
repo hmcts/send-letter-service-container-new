@@ -15,7 +15,7 @@ public class BlobProcessor {
     }
 
     public boolean read() throws InterruptedException {
-        LOG.info("About to read new blob from {}", connection);
+        LOG.info("About to read new blob connection details {}", connection);
         Thread.sleep(10_000);
         return true;
     }
