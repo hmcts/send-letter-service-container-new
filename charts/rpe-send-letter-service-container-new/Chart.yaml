@@ -22,5 +22,5 @@ appVersion: 0.0.1
 
 dependencies:
   - name: function
-    version: 0.2.1-beta
+    version: 0.2.2
     repository: '@hmctspublic'
