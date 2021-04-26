@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class ApplicationTest {
 
     @Test
-    void dummyTest() {
+    public void dummyTest() {
         int temp = 10;
         assertEquals(10, temp, "Values match remove this");
     }

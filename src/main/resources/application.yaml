@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: Send Letter Service Container New
+  config:
+    import: "optional:configtree:/mnt/secrets/rpe-send-letter/"
+
+storage:
+  connection: ${STORAGE_ACCOUNT_CONNECTION_STRING}
