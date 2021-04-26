@@ -16,6 +16,10 @@ public class BlobProcessor {
 
     public boolean read() throws InterruptedException {
         LOG.info("About to read new blob connection details");
+        if (connection != null) {
+            LOG.info("Blog connection found");
+        }
+
         Thread.sleep(10_000);
         return true;
     }
