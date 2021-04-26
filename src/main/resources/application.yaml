@@ -5,6 +5,3 @@ spring:
     import: "optional:configtree:/mnt/secrets/rpe-send-letter/"
 storage:
   connection: ${STORAGE_ACCOUNT_CONNECTION_STRING}
-azure:
-  keyValue: ${azure.application-insights.instrumentation-key}
-

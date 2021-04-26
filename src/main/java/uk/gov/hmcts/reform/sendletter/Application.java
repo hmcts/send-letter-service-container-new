@@ -17,13 +17,13 @@ public class Application implements CommandLineRunner {
     private BlobProcessor retrieve;
 
     public static void main(final String[] args) {
-        LOGGER.info("send letter new KEDA container invoked");
         SpringApplication.run(Application.class, args);
     }
 
     @Override
     public void run(String... args) {
         try {
+            LOGGER.info("send letter new KEDA container invoked");
             retrieve.read();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
