@@ -10,7 +10,7 @@ class BlobProcessorTest {
 
     @BeforeEach
     void setUp() {
-        processBlob = new BlobProcessor("blobStorageConnection");
+        processBlob = new BlobProcessor("blobStorageConnection", "dummyAzurekey");
     }
 
     @Test
