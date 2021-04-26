@@ -14,4 +14,3 @@ function:
     type: azure-blob
     blob:
       blobContainerName: "new"
-      blobCount: 5
