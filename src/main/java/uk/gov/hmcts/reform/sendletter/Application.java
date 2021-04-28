@@ -8,6 +8,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import uk.gov.hmcts.reform.sendletter.blob.BlobProcessor;
 
+import java.util.List;
+import java.util.Optional;
+
 @SuppressWarnings("HideUtilityClassConstructor")
 @SpringBootApplication
 public class Application implements CommandLineRunner {
@@ -23,7 +26,8 @@ public class Application implements CommandLineRunner {
     @Override
     public void run(String... args) {
         try {
-            LOGGER.info("send letter new KEDA container invoked");
+            LOGGER.info("send letter new KEDA container invoked {}",
+                    Optional.ofNullable(args).map(List::of));
             retrieve.read();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
