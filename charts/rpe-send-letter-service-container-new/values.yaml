@@ -10,7 +10,8 @@ function:
           alias: STORAGE_ACCOUNT_CONNECTION_STRING
         - name: app-insights-instrumentation-key
           alias: azure.application-insights.instrumentation-key
-  trigger:
-    type: azure-blob
-    blob:
+  triggerAuthName: "azure-blob-auth"
+  triggers:
+    - type: azure-blob
       blobContainerName: "new"
+      accountName: "rpesendletter{{ .Values.global.environment }}"
