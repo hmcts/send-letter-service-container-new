@@ -170,6 +170,7 @@ dependencyManagement {
       entry 'netty-buffer'
       entry 'netty-codec'
       entry 'netty-codec-http'
+      entry 'netty-codec-http2'
       entry 'netty-codec-socks'
       entry 'netty-common'
       entry 'netty-handler'
