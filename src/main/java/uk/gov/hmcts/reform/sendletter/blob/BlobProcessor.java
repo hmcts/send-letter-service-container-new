@@ -2,24 +2,21 @@ package uk.gov.hmcts.reform.sendletter.blob;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.sendletter.blob.component.BlobReader;
 
 @Service
 public class BlobProcessor {
     private static final Logger LOG = LoggerFactory.getLogger(BlobProcessor.class);
-    private final String connection;
+    private final BlobReader blobReader;
 
-    public BlobProcessor(@Value("${storage.connection}") String accountConnection) {
-        this.connection = accountConnection;
+    public BlobProcessor(BlobReader blobReader) {
+        this.blobReader = blobReader;
     }
 
     public boolean read() throws InterruptedException {
-        LOG.info("About to read new blob connection details");
-        if (connection != null) {
-            LOG.info("Blog connection found");
-        }
-
+        String blob = blobReader.retrieveFileToProcess();
+        LOG.info("BlobName : {}", blob);
         Thread.sleep(10_000);
         return true;
     }
