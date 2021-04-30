@@ -1,34 +1,29 @@
 package uk.gov.hmcts.reform.sendletter.blob.component;
 
-import com.azure.storage.blob.BlobServiceClientBuilder;
 import com.azure.storage.blob.models.BlobItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
 public class BlobReader {
 
     private static final Logger LOG = LoggerFactory.getLogger(BlobReader.class);
-    private static final String NEW_CONTAINER = "new";
-    private final String connection;
 
-    public BlobReader(@Value("${storage.connection}") String connection) {
-        this.connection = connection;
+    private final BlobManager blobManager;
+    private static final String NEW_CONTAINER = "new";
+
+    public BlobReader(BlobManager blobManager) {
+        this.blobManager =  blobManager;
     }
 
     public String retrieveFileToProcess() {
         LOG.info("About to read new blob connection details");
-        if (connection != null) {
-            LOG.info("Blog connection found");
-        }
-        // Create a BlobServiceClient object which will be used to create a container client
-        var blobServiceClient = new BlobServiceClientBuilder().connectionString(connection).buildClient();
-        var containerClient = blobServiceClient.getBlobContainerClient(NEW_CONTAINER);
-
+        var containerClient = blobManager.listContainerClient(NEW_CONTAINER);
         String blobName = containerClient.listBlobs().stream().findFirst().map(BlobItem::getName).orElse("");
         LOG.info("BlobReader:: Blob name: {}", blobName);
         return blobName;
     }
+
+
 }
