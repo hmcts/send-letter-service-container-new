@@ -15,7 +15,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-public class BlobManagerTest {
+class BlobManagerTest {
 
     @Mock
     private BlobServiceClient blobServiceClient;
@@ -23,12 +23,12 @@ public class BlobManagerTest {
     private BlobManager blobManager;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         blobManager = new BlobManager(blobServiceClient);
     }
 
     @Test
-    public void listContainer_retrieves_container_from_client() {
+    void listContainer_retrieves_container_from_client() {
         BlobContainerClient expectedContainer = mock(BlobContainerClient.class);
         String containerName = "container-name";
 
