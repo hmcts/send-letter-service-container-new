@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sendletter.blob.component;
 
-import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +26,7 @@ public class BlobBackup {
 
         var destContainerClient = blobManager.getContainerClient(BACKUP_CONTAINER);
 
-        BlobClient sourceBlobClient = new BlobClientBuilder()
+        var sourceBlobClient = new BlobClientBuilder()
                 .endpoint(blobManager.getAccountUrl())
                 .sasToken(sasTokenGeneratorService.generateSasToken("bulkprint"))
                 .containerName(NEW_CONTAINER)

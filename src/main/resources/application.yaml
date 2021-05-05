@@ -6,3 +6,8 @@ spring:
 
 storage:
   connection: ${STORAGE_ACCOUNT_CONNECTION_STRING}
+
+accesstoken:
+  serviceConfig:
+    - serviceName: bulkprint
+      validity: ${SAS_TOKEN_VALIDITY:300} #In seconds
