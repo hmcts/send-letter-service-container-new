@@ -28,14 +28,21 @@ class BlobManagerTest {
     }
 
     @Test
-    void listContainer_retrieves_container_from_client() {
+    void retrieves_container_from_client() {
         BlobContainerClient expectedContainer = mock(BlobContainerClient.class);
         String containerName = "container-name";
 
         given(blobServiceClient.getBlobContainerClient(any())).willReturn(expectedContainer);
-        BlobContainerClient actualContainer = blobManager.listContainerClient(containerName);
+        BlobContainerClient actualContainer = blobManager.getContainerClient(containerName);
 
         assertThat(actualContainer).isSameAs(expectedContainer);
         verify(blobServiceClient).getBlobContainerClient(containerName);
+    }
+
+    @Test
+    void retrieves_account_url() {
+        given(blobManager.getAccountUrl()).willReturn("http://test.account");
+        String accountUrl = blobManager.getAccountUrl();
+        assertThat(accountUrl).isSameAs("http://test.account");
     }
 }

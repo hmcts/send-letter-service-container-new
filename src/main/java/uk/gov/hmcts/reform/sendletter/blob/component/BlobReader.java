@@ -19,7 +19,7 @@ public class BlobReader {
 
     public String retrieveFileToProcess() {
         LOG.info("About to read new blob connection details");
-        var containerClient = blobManager.listContainerClient(NEW_CONTAINER);
+        var containerClient = blobManager.getContainerClient(NEW_CONTAINER);
         String blobName = containerClient.listBlobs().stream().findFirst().map(BlobItem::getName).orElse("");
         LOG.info("BlobReader:: Blob name: {}", blobName);
         return blobName;
