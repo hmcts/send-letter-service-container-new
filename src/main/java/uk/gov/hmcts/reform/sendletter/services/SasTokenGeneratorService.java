@@ -40,7 +40,7 @@ public class SasTokenGeneratorService {
 
         try {
             return blobServiceClient
-                    .getBlobContainerClient(serviceName)
+                    .getBlobContainerClient(config.getNewContainerName())
                     .generateSas(createSharedAccessPolicy(config));
         } catch (Exception e) {
             throw new UnableToGenerateSasTokenException(e);
