@@ -212,7 +212,7 @@ ext.libraries = [
 
 dependencies {
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter'
-
+  implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '11.0'
   implementation group: 'uk.gov.hmcts.reform', name: 'logging', version: versions.reformLogging
   implementation group: 'uk.gov.hmcts.reform', name: 'logging-appinsights', version: versions.reformLogging
   implementation group: 'com.azure', name: 'azure-storage-blob', version: '12.10.2'

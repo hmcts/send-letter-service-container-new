@@ -35,7 +35,7 @@ class BlobReaderTest {
 
     @Test
     void should_list_blob_name()  {
-        given(blobManager.listContainerClient(CONTAINER_1)).willReturn(blobContainerClient);
+        given(blobManager.getContainerClient(CONTAINER_1)).willReturn(blobContainerClient);
         given(blobContainerClient.listBlobs()).willReturn(mockedPagedIterable);
         given(mockedBlobItem.getName()).willReturn("test.zip");
         given(mockedPagedIterable.stream()).willReturn(Stream.of(mockedBlobItem));

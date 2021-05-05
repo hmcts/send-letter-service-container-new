@@ -13,7 +13,11 @@ public class BlobManager {
         this.blobServiceClient = blobServiceClient;
     }
 
-    public BlobContainerClient listContainerClient(String containerName) {
+    public BlobContainerClient getContainerClient(String containerName) {
         return blobServiceClient.getBlobContainerClient(containerName);
+    }
+
+    public String getAccountUrl() {
+        return blobServiceClient.getAccountUrl();
     }
 }
