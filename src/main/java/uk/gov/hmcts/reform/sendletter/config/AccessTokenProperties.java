@@ -19,6 +19,7 @@ public class AccessTokenProperties {
     public static class TokenConfig {
         private String serviceName;
         private int validity;
+        private String newContainerName;
 
         public String getServiceName() {
             return serviceName;
@@ -34,6 +35,14 @@ public class AccessTokenProperties {
 
         public void setValidity(int validity) {
             this.validity = validity;
+        }
+
+        public String getNewContainerName() {
+            return newContainerName;
+        }
+
+        public void setNewContainerName(String newContainerName) {
+            this.newContainerName = newContainerName;
         }
     }
 }
