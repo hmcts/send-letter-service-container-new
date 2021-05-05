@@ -30,9 +30,9 @@ class BlobBackupTest {
 
     @Mock private BlobManager blobManager;
     @Mock private BlobContainerClient destContainerClient;
-    private BlobClient sourceBlobClient;
     @Mock private BlobClient destBlobClient;
 
+    private BlobClient sourceBlobClient;
     private BlobBackup blobBackup;
 
     @BeforeEach
