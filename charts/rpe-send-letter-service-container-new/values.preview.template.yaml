@@ -1,7 +1,6 @@
 function:
   # Don't modify below here
   image: ${IMAGE_NAME}
-  triggerAuthName: "azure-blob-auth-{{ .Release.Name }}"
   triggers:
     - type: azure-blob
       blobContainerName: "new"
