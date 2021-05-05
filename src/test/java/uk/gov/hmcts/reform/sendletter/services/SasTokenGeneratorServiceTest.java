@@ -65,13 +65,13 @@ class SasTokenGeneratorServiceTest {
     void should_throw_exception_when_requested_service_is_not_configured() throws Exception {
         assertThatThrownBy(() -> tokenGeneratorService.generateSasToken("doesnotexist"))
                 .isInstanceOf(ServiceConfigNotFoundException.class)
-                .hasMessage("No service configuration found for service doesnotexist");
+                .hasMessage("No service configuration found for containerName doesnotexist");
     }
 
     private void createAccessTokenConfig() {
         AccessTokenProperties.TokenConfig tokenConfig = new AccessTokenProperties.TokenConfig();
         tokenConfig.setValidity(300);
-        tokenConfig.setServiceName("bulkprint");
+        tokenConfig.setContainerName("bulkprint");
 
         accessTokenProperties = new AccessTokenProperties();
         accessTokenProperties.setServiceConfig(singletonList(tokenConfig));

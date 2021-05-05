@@ -17,15 +17,15 @@ public class AccessTokenProperties {
     }
 
     public static class TokenConfig {
-        private String serviceName;
+        private String containerName;
         private int validity;
 
-        public String getServiceName() {
-            return serviceName;
+        public String getContainerName() {
+            return containerName;
         }
 
-        public void setServiceName(String serviceName) {
-            this.serviceName = serviceName;
+        public void setContainerName(String containerName) {
+            this.containerName = containerName;
         }
 
         public int getValidity() {

@@ -9,5 +9,5 @@ storage:
 
 accesstoken:
   serviceConfig:
-    - serviceName: bulkprint
+    - containerName: new
       validity: ${SAS_TOKEN_VALIDITY:300} #In seconds

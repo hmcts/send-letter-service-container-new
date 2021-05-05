@@ -55,7 +55,7 @@ class BlobBackupTest {
 
         sourceBlobClient = new BlobClientBuilder()
                 .endpoint(blobManager.getAccountUrl())
-                .sasToken(tokenGeneratorService.generateSasToken("bulkprint"))
+                .sasToken(tokenGeneratorService.generateSasToken(NEW_CONTAINER))
                 .containerName(NEW_CONTAINER)
                 .blobName(BLOB_NAME)
                 .buildClient();
@@ -63,12 +63,9 @@ class BlobBackupTest {
 
     @Test
     void should_copy_blob_from_new_container_to_backup_container() {
-        given(blobManager.getAccountUrl()).willReturn("http://test.account");
         given(blobManager.getContainerClient(BACKUP_CONTAINER)).willReturn(destContainerClient);
         given(destBlobClient.copyFromUrl(sourceBlobClient.getBlobUrl())).willReturn("copyId");
         given(destContainerClient.getBlobClient(anyString())).willReturn(destBlobClient);
-        given(destBlobClient.copyFromUrl(sourceBlobClient.getBlobUrl())).willReturn("copyId");
-
         assertThat(blobBackup.backupBlob(BLOB_NAME)).isEqualTo("copyId");
     }
 
@@ -76,7 +73,7 @@ class BlobBackupTest {
     private void createAccessTokenConfig() {
         AccessTokenProperties.TokenConfig tokenConfig = new AccessTokenProperties.TokenConfig();
         tokenConfig.setValidity(300);
-        tokenConfig.setServiceName("bulkprint");
+        tokenConfig.setContainerName(NEW_CONTAINER);
 
         accessTokenProperties = new AccessTokenProperties();
         accessTokenProperties.setServiceConfig(singletonList(tokenConfig));

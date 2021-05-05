@@ -33,14 +33,14 @@ public class SasTokenGeneratorService {
         this.accessTokenProperties = accessTokenProperties;
     }
 
-    public String generateSasToken(String serviceName) {
+    public String generateSasToken(String containerName) {
         String storageAccountUri = blobServiceClient.getAccountUrl();
-        LOG.info("SAS Token request received for service {}. Account URI: {}", serviceName, storageAccountUri);
-        var config = getTokenConfigForService(serviceName);
+        LOG.info("SAS Token request received for container {}. Account URI: {}", containerName, storageAccountUri);
+        var config = getTokenConfigForService(containerName);
 
         try {
             return blobServiceClient
-                    .getBlobContainerClient(serviceName)
+                    .getBlobContainerClient(containerName)
                     .generateSas(createSharedAccessPolicy(config));
         } catch (Exception e) {
             throw new UnableToGenerateSasTokenException(e);
@@ -55,13 +55,13 @@ public class SasTokenGeneratorService {
         );
     }
 
-    private TokenConfig getTokenConfigForService(String serviceName) {
+    private TokenConfig getTokenConfigForService(String containerName) {
         return accessTokenProperties.getServiceConfig().stream()
-            .filter(tokenConfig -> tokenConfig.getServiceName().equalsIgnoreCase(serviceName))
+            .filter(tokenConfig -> tokenConfig.getContainerName().equalsIgnoreCase(containerName))
             .findFirst()
             .orElseThrow(
                     () -> new ServiceConfigNotFoundException(
-                            "No service configuration found for service " + serviceName)
+                            "No service configuration found for containerName " + containerName)
             );
     }
 

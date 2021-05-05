@@ -25,7 +25,7 @@ public class BlobBackup {
         LOG.info("About to backup original blob in backup container");
 
         var destContainerClient = blobManager.getContainerClient(BACKUP_CONTAINER);
-        var sasToken = sasTokenGeneratorService.generateSasToken("bulkprint");
+        var sasToken = sasTokenGeneratorService.generateSasToken(NEW_CONTAINER);
         LOG.info("BlobBackup:: sasToken: {}", sasToken);
         var sourceBlobClient = new BlobClientBuilder()
                 .endpoint(blobManager.getAccountUrl())
