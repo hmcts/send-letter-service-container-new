@@ -10,7 +10,8 @@ function:
           alias: STORAGE_ACCOUNT_CONNECTION_STRING
         - name: app-insights-instrumentation-key
           alias: azure.application-insights.instrumentation-key
-  triggerAuthName: "azure-blob-auth"
+  triggerAuth:
+    enabled: true
   triggers:
     - type: azure-blob
       blobContainerName: "new"
