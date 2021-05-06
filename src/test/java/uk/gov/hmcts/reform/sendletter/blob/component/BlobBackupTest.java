@@ -66,11 +66,9 @@ class BlobBackupTest {
 
     @Test
     void should_copy_blob_from_new_container_to_backup_container() {
-        given(blobManager.getAccountUrl()).willReturn("http://test.account");
         given(blobManager.getContainerClient(BACKUP_CONTAINER)).willReturn(destContainerClient);
         given(destBlobClient.copyFromUrl(sourceBlobClient.getBlobUrl() + "?" + sasToken)).willReturn("copyId");
         given(destContainerClient.getBlobClient(anyString())).willReturn(destBlobClient);
-        given(destBlobClient.copyFromUrl(sourceBlobClient.getBlobUrl() + "?" + sasToken)).willReturn("copyId");
 
         assertThat(blobBackup.backupBlob(BLOB_NAME)).isEqualTo("copyId");
     }
