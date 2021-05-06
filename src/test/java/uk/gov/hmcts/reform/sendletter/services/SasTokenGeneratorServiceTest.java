@@ -11,8 +11,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sendletter.config.AccessTokenProperties;
 import uk.gov.hmcts.reform.sendletter.exceptions.ServiceConfigNotFoundException;
+import uk.gov.hmcts.reform.sendletter.exceptions.UnableToGenerateSasTokenException;
 
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
@@ -51,7 +52,7 @@ class SasTokenGeneratorServiceTest {
         String currentDate = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(OffsetDateTime.now(UTC));
 
         Map<String, String> queryParams = URLEncodedUtils
-                .parse(sasToken, Charset.forName("UTF-8")).stream()
+                .parse(sasToken, StandardCharsets.UTF_8).stream()
                 .collect(Collectors.toMap(NameValuePair::getName, NameValuePair::getValue));
 
 
@@ -66,6 +67,15 @@ class SasTokenGeneratorServiceTest {
         assertThatThrownBy(() -> tokenGeneratorService.generateSasToken("doesnotexist"))
                 .isInstanceOf(ServiceConfigNotFoundException.class)
                 .hasMessage("No service configuration found for service doesnotexist");
+    }
+
+    @Test
+    void should_throw_exception_when_service_client_is_null() {
+        BlobServiceClient blobServiceClient = null;
+        tokenGeneratorService = new SasTokenGeneratorService(blobServiceClient, accessTokenProperties);
+        assertThatThrownBy(() -> tokenGeneratorService.generateSasToken("bulkprint"))
+                .isInstanceOf(UnableToGenerateSasTokenException.class)
+                .hasMessage("java.lang.NullPointerException");
     }
 
     private void createAccessTokenConfig() {
