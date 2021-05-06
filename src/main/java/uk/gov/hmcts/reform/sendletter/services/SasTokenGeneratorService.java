@@ -35,8 +35,12 @@ public class SasTokenGeneratorService {
 
     public String generateSasToken(String serviceName) {
         String storageAccountUri = blobServiceClient.getAccountUrl();
-        LOG.info("SAS Token request received for service {}. Account URI: {}", serviceName, storageAccountUri);
         var config = getTokenConfigForService(serviceName);
+        LOG.info(
+                "SAS Token request received for container '{}'. Account URI: {}",
+                config.getNewContainerName(),
+                storageAccountUri
+        );
 
         try {
             return blobServiceClient
