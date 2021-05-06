@@ -27,6 +27,7 @@ public class BlobBackup {
         var destContainerClient = blobManager.getContainerClient(BACKUP_CONTAINER);
         var sasToken = sasTokenGeneratorService.generateSasToken("bulkprint");
         LOG.info("BlobBackup:: sasToken: {}", sasToken);
+
         var sourceBlobClient = new BlobClientBuilder()
                 .endpoint(blobManager.getAccountUrl())
                 .sasToken(sasToken)
@@ -35,10 +36,9 @@ public class BlobBackup {
                 .buildClient();
 
         var destBlobClient = destContainerClient.getBlobClient(originalBlob);
-        String copyId = destBlobClient.copyFromUrl(sourceBlobClient.getBlobUrl());
+        String copyId = destBlobClient.copyFromUrl(sourceBlobClient.getBlobUrl() + "?" + sasToken);
         LOG.info("Blob backup complete copy id {} ", copyId);
         return copyId;
     }
-
 
 }
