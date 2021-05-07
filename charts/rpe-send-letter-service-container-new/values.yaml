@@ -14,5 +14,30 @@ function:
     enabled: true
   triggers:
     - type: azure-blob
-      blobContainerName: "new"
+      blobContainerName: "new-cmc"
       accountName: "rpesendletter{{ .Values.global.environment }}"
+      blobPrefix: manifest-
+    - type: azure-blob
+      blobContainerName: "new-divorce"
+      accountName: "rpesendletter{{ .Values.global.environment }}"
+      blobPrefix: manifest-
+    - type: azure-blob
+      blobContainerName: "new-finrem"
+      accountName: "rpesendletter{{ .Values.global.environment }}"
+      blobPrefix: manifest-
+    - type: azure-blob
+      blobContainerName: "new-fpl"
+      accountName: "rpesendletter{{ .Values.global.environment }}"
+      blobPrefix: manifest-
+    - type: azure-blob
+      blobContainerName: "new-nfdivorce"
+      accountName: "rpesendletter{{ .Values.global.environment }}"
+      blobPrefix: manifest-
+    - type: azure-blob
+      blobContainerName: "new-probate"
+      accountName: "rpesendletter{{ .Values.global.environment }}"
+      blobPrefix: manifest-
+    - type: azure-blob
+      blobContainerName: "new-sscs"
+      accountName: "rpesendletter{{ .Values.global.environment }}"
+      blobPrefix: manifest-
