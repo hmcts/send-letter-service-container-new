@@ -12,19 +12,19 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sendletter.config.AccessTokenProperties;
+import uk.gov.hmcts.reform.sendletter.model.in.ManifestBlobInfo;
 import uk.gov.hmcts.reform.sendletter.services.SasTokenGeneratorService;
 
 import static java.util.Collections.singletonList;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
 class BlobBackupTest {
 
-    private static final String NEW_CONTAINER = "new";
+    private static final String NEW_CONTAINER = "new-sscs";
     private static final String BACKUP_CONTAINER = "backup";
-    private static final String BLOB_NAME  = "blob.zip";
+    private static final String BLOB_NAME  = "manifests-xyz.json";
 
     private AccessTokenProperties accessTokenProperties;
 
@@ -35,6 +35,7 @@ class BlobBackupTest {
     private BlobClient sourceBlobClient;
     private BlobBackup blobBackup;
     private String sasToken;
+    private ManifestBlobInfo blobInfo;
 
     @BeforeEach
     void setUp() {
@@ -54,7 +55,7 @@ class BlobBackupTest {
                 new SasTokenGeneratorService(blobServiceClient, accessTokenProperties);
         blobBackup = new BlobBackup(blobManager, tokenGeneratorService);
 
-        sasToken = tokenGeneratorService.generateSasToken("bulkprint");
+        sasToken = tokenGeneratorService.generateSasToken("sscs");
 
         sourceBlobClient = new BlobClientBuilder()
                 .endpoint(blobManager.getAccountUrl())
@@ -62,6 +63,8 @@ class BlobBackupTest {
                 .containerName(NEW_CONTAINER)
                 .blobName(BLOB_NAME)
                 .buildClient();
+
+        blobInfo =  new ManifestBlobInfo("sscs", NEW_CONTAINER, BLOB_NAME);
     }
 
     @Test
@@ -70,14 +73,14 @@ class BlobBackupTest {
         given(destBlobClient.copyFromUrl(sourceBlobClient.getBlobUrl() + "?" + sasToken)).willReturn("copyId");
         given(destContainerClient.getBlobClient(anyString())).willReturn(destBlobClient);
 
-        assertThat(blobBackup.backupBlob(BLOB_NAME)).isEqualTo("copyId");
+        //blobBackup.backupBlobs(blobInfo);
     }
 
 
     private void createAccessTokenConfig() {
         AccessTokenProperties.TokenConfig tokenConfig = new AccessTokenProperties.TokenConfig();
         tokenConfig.setValidity(300);
-        tokenConfig.setServiceName("bulkprint");
+        tokenConfig.setServiceName("sscs");
 
         accessTokenProperties = new AccessTokenProperties();
         accessTokenProperties.setServiceConfig(singletonList(tokenConfig));
