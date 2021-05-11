@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sendletter.blob.component;
 
 import com.azure.storage.blob.BlobContainerClient;
+import com.azure.storage.blob.models.BlobItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -26,21 +27,23 @@ public class BlobReader {
     public Optional<ManifestBlobInfo> retrieveManifestsToProcess() {
         LOG.info("About to read manifests details");
         var containers = new ArrayList<>(accessTokenProperties.getServiceConfig());
-        Optional<ManifestBlobInfo> manifest = Optional.empty();
 
         for (AccessTokenProperties.TokenConfig config : containers) {
+            String serviceName = config.getServiceName();
+            String containerName = config.getNewContainerName();
 
-            BlobContainerClient containerClient = blobManager.getContainerClient(config.getNewContainerName());
-            manifest = containerClient.listBlobs().stream().filter(obj -> obj.getName().startsWith("manifest"))
-                    .findFirst().map(blobItem -> new ManifestBlobInfo(config.getServiceName(),
-                            config.getNewContainerName(), blobItem.getName()));
+            BlobContainerClient containerClient = blobManager.getContainerClient(containerName);
+            Optional<String> blobName  = containerClient.listBlobs().stream().filter(obj -> obj.getName().startsWith(
+                    "manifest")).findFirst().map(BlobItem::getName);
 
 
-            if (manifest.isPresent())   {
-                break;
+            if (blobName.isPresent()) {
+                LOG.info("BlobReader:: ServiceName {}, Container {}, Blob name: {}", serviceName,
+                        containerName, blobName.get());
+                return Optional.of(new ManifestBlobInfo(serviceName, containerName, blobName.get()));
             }
         }
 
-        return manifest;
+        return Optional.empty();
     }
 }

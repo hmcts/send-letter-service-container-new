@@ -1,9 +1,7 @@
 package uk.gov.hmcts.reform.sendletter.blob.component;
 
 import com.azure.storage.blob.BlobClientBuilder;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.microsoft.applicationinsights.boot.dependencies.apachecommons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -14,48 +12,44 @@ import uk.gov.hmcts.reform.sendletter.services.SasTokenGeneratorService;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 
 @Component
 public class BlobBackup {
 
     private static final Logger LOG = LoggerFactory.getLogger(BlobBackup.class);
-
     private final SasTokenGeneratorService sasTokenGeneratorService;
     private final BlobManager blobManager;
+    private final ObjectMapper mapper;
     private static final String BACKUP_CONTAINER = "backup";
 
-    public BlobBackup(BlobManager blobManager, SasTokenGeneratorService sasTokenGeneratorService) {
+    public BlobBackup(BlobManager blobManager, SasTokenGeneratorService sasTokenGeneratorService, ObjectMapper mapper) {
         this.blobManager =  blobManager;
         this.sasTokenGeneratorService  = sasTokenGeneratorService;
+        this.mapper = mapper;
     }
 
     public PrintResponse backupBlobs(ManifestBlobInfo blobInfo) {
         PrintResponse printResponse = null;
+        String destDirectory = "./data/";
         try {
             String serviceName = blobInfo.getServiceName();
             String containerName = blobInfo.getContainerName();
             String fileName = blobInfo.getBlobName();
 
+
             LOG.info("getPdfInfo serviceName {}, containerName {}, blobName {}", serviceName, containerName, fileName);
 
-            String destDirectory = Files.createTempDirectory("tmpDirPrefix").toFile().getAbsolutePath();
+            //String destDirectory = Files.createTempDirectory("tmpDirPrefix").toFile().getAbsolutePath();
 
             var sasToken = sasTokenGeneratorService.generateSasToken(blobInfo.getServiceName());
+            LOG.info("sasToken code: {}", sasToken);
+            var  sourceBlobClient = blobManager.getBlobClient(containerName, sasToken, fileName);
 
-            var sourceBlobClient = new BlobClientBuilder()
-                    .endpoint(blobManager.getAccountUrl())
-                    .sasToken(sasToken)
-                    .containerName(containerName)
-                    .blobName(fileName)
-                    .buildClient();
-
-            var blobFile = destDirectory + File.separator + fileName;
+            var blobFile = destDirectory + fileName;
             sourceBlobClient.downloadToFile(blobFile);
 
-            ObjectMapper mapper = new ObjectMapper();
-            mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-            printResponse = mapper.readValue(new File(blobFile), PrintResponse.class);
+            File file =  new File(blobFile);
+            printResponse = mapper.readValue(file, PrintResponse.class);
 
             if (printResponse != null && printResponse.printJob != null && printResponse.printJob.documents != null) {
                 for (Document m : printResponse.printJob.documents) {
@@ -65,7 +59,7 @@ public class BlobBackup {
                 }
                 doBackup(fileName, sasToken, containerName);
             }
-            FileUtils.deleteDirectory(new File(destDirectory));
+            file.delete();
 
         } catch (IOException e) {
             LOG.error("Error occured while performing backup", e);
