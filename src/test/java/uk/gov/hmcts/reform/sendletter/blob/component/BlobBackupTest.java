@@ -13,7 +13,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sendletter.config.AccessTokenProperties;
 import uk.gov.hmcts.reform.sendletter.model.in.ManifestBlobInfo;
@@ -31,6 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 
@@ -114,7 +114,7 @@ class BlobBackupTest {
         myWriter.write(json);
         myWriter.close();
 
-        Mockito.lenient().when(mapper.readValue(json, PrintResponse.class)).thenReturn(printResponse);
+        lenient().when(mapper.readValue(json, PrintResponse.class)).thenReturn(printResponse);
 
         PrintResponse response = blobBackup.backupBlobs(blobInfo);
         assertThat(response.printJob.printStatus).isSameAs(PrintStatus.PROCESSED);
