@@ -55,7 +55,6 @@ class BlobBackupTest {
 
     private BlobClient sourceBlobClient;
     private BlobBackup blobBackup;
-    private String sasToken;
     private ManifestBlobInfo blobInfo;
     private ObjectMapper mapper;
 
@@ -79,7 +78,7 @@ class BlobBackupTest {
                 accessTokenProperties);
         blobBackup = new BlobBackup(blobManager, sasTokenGeneratorService, mapper);
 
-        sasToken = sasTokenGeneratorService.generateSasToken(TEST_SERVICE_NAME);
+        String sasToken = sasTokenGeneratorService.generateSasToken(TEST_SERVICE_NAME);
 
         sourceBlobClient = new BlobClientBuilder()
                 .endpoint(blobManager.getAccountUrl())
