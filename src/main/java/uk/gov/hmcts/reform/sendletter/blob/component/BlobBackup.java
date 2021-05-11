@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sendletter.model.in.Document;
 import uk.gov.hmcts.reform.sendletter.model.in.ManifestBlobInfo;
-import uk.gov.hmcts.reform.sendletter.model.in.out.PrintResponse;
+import uk.gov.hmcts.reform.sendletter.model.out.PrintResponse;
 import uk.gov.hmcts.reform.sendletter.services.SasTokenGeneratorService;
 
 import java.io.File;
