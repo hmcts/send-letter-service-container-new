@@ -66,7 +66,7 @@ public class BlobBackup {
     }
 
     private void cleanUp(File file) throws IOException {
-        Path path = Path.of(file.getAbsolutePath());
+        var path = Path.of(file.getAbsolutePath());
         Files.delete(path);
     }
 
