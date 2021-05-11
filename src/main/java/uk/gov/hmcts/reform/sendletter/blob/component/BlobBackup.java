@@ -12,6 +12,8 @@ import uk.gov.hmcts.reform.sendletter.services.SasTokenGeneratorService;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 @Component
 public class BlobBackup {
@@ -30,17 +32,13 @@ public class BlobBackup {
 
     public PrintResponse backupBlobs(ManifestBlobInfo blobInfo) {
         PrintResponse printResponse = null;
-        String destDirectory = "./data/";
+        var destDirectory = "./data/";
         try {
-            String serviceName = blobInfo.getServiceName();
-            String containerName = blobInfo.getContainerName();
-            String fileName = blobInfo.getBlobName();
-
+            var serviceName = blobInfo.getServiceName();
+            var containerName = blobInfo.getContainerName();
+            var fileName = blobInfo.getBlobName();
 
             LOG.info("getPdfInfo serviceName {}, containerName {}, blobName {}", serviceName, containerName, fileName);
-
-            //String destDirectory = Files.createTempDirectory("tmpDirPrefix").toFile().getAbsolutePath();
-
             var sasToken = sasTokenGeneratorService.generateSasToken(blobInfo.getServiceName());
             LOG.info("sasToken code: {}", sasToken);
             var  sourceBlobClient = blobManager.getBlobClient(containerName, sasToken, fileName);
@@ -48,23 +46,28 @@ public class BlobBackup {
             var blobFile = destDirectory + fileName;
             sourceBlobClient.downloadToFile(blobFile);
 
-            File file =  new File(blobFile);
+            var file =  new File(blobFile);
             printResponse = mapper.readValue(file, PrintResponse.class);
 
             if (printResponse != null && printResponse.printJob != null && printResponse.printJob.documents != null) {
                 for (Document m : printResponse.printJob.documents) {
-                    String pdfFile = m.uploadToPath;
+                    var pdfFile = m.uploadToPath;
                     LOG.info("Document FileName {}, NoOfCopies {}, uploadToPath {}", m.fileName, m.copies, pdfFile);
                     doBackup(pdfFile, sasToken, containerName);
                 }
                 doBackup(fileName, sasToken, containerName);
             }
-            file.delete();
+            cleanUp(file);
 
         } catch (IOException e) {
             LOG.error("Error occured while performing backup", e);
         }
         return printResponse;
+    }
+
+    private void cleanUp(File file) throws IOException {
+        Path path = Path.of(file.getAbsolutePath());
+        Files.delete(path);
     }
 
     private void doBackup(String pdfFile, String sasToken, String sourceContainerName) {
@@ -79,7 +82,7 @@ public class BlobBackup {
                 .buildClient();
 
         var destBlobClient = destContainerClient.getBlobClient(pdfFile);
-        String blob = sourceBlobClient.getBlobUrl();
+        var blob = sourceBlobClient.getBlobUrl();
         destBlobClient.copyFromUrl(blob + "?" + sasToken);
         LOG.info("Blob {} backup completed.", blob);
     }

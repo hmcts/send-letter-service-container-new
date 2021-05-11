@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sendletter.blob.component.BlobBackup;
 import uk.gov.hmcts.reform.sendletter.blob.component.BlobReader;
 import uk.gov.hmcts.reform.sendletter.model.in.ManifestBlobInfo;
-import uk.gov.hmcts.reform.sendletter.model.in.out.PrintResponse;
 
 import java.util.Optional;
 
@@ -26,7 +25,7 @@ public class BlobProcessor {
         Optional<ManifestBlobInfo> blobInfo = blobReader.retrieveManifestsToProcess();
 
         if (blobInfo.isPresent()) {
-            PrintResponse printResponse = blobBackup.backupBlobs(blobInfo.get());
+            var printResponse = blobBackup.backupBlobs(blobInfo.get());
             LOG.info("PrintResponse {}", printResponse);
         }
 
