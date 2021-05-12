@@ -3,6 +3,8 @@ spring:
     name: Send Letter Service Container New
   config:
     import: "optional:configtree:/mnt/secrets/rpe-send-letter/"
+  jackson:
+    serialization.write_dates_as_timestamps: false
 
 storage:
   connection: ${STORAGE_ACCOUNT_CONNECTION_STRING}
