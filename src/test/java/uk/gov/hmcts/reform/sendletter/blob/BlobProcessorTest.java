@@ -11,7 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sendletter.blob.component.BlobBackup;
 import uk.gov.hmcts.reform.sendletter.blob.component.BlobReader;
 import uk.gov.hmcts.reform.sendletter.model.in.ManifestBlobInfo;
-import uk.gov.hmcts.reform.sendletter.model.out.PrintResponse;
+import uk.gov.hmcts.reform.sendletter.model.in.PrintResponse;
 
 import java.io.IOException;
 import java.util.Optional;

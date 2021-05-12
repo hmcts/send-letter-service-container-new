@@ -1,10 +1,14 @@
-package uk.gov.hmcts.reform.sendletter.model.out;
+package uk.gov.hmcts.reform.sendletter.model.in;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.common.io.Resources;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.sendletter.model.in.Document;
+import uk.gov.hmcts.reform.sendletter.model.in.PrintJob;
+import uk.gov.hmcts.reform.sendletter.model.in.PrintResponse;
+import uk.gov.hmcts.reform.sendletter.model.in.PrintStatus;
+import uk.gov.hmcts.reform.sendletter.model.in.PrintUploadInfo;
 
 import java.io.IOException;
 import java.time.LocalDateTime;

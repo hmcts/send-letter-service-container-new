@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sendletter.model.out;
+package uk.gov.hmcts.reform.sendletter.model.in;
 
 public enum PrintStatus {
     NEW,

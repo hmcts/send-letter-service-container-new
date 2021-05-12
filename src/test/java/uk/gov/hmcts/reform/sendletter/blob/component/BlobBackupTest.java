@@ -16,8 +16,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sendletter.config.AccessTokenProperties;
 import uk.gov.hmcts.reform.sendletter.model.in.ManifestBlobInfo;
-import uk.gov.hmcts.reform.sendletter.model.out.PrintResponse;
-import uk.gov.hmcts.reform.sendletter.model.out.PrintStatus;
+import uk.gov.hmcts.reform.sendletter.model.in.PrintResponse;
+import uk.gov.hmcts.reform.sendletter.model.in.PrintStatus;
 import uk.gov.hmcts.reform.sendletter.services.SasTokenGeneratorService;
 
 import java.io.FileWriter;

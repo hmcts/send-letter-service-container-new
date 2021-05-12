@@ -1,7 +1,6 @@
-package uk.gov.hmcts.reform.sendletter.model.out;
+package uk.gov.hmcts.reform.sendletter.model.in;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import uk.gov.hmcts.reform.sendletter.model.in.Document;
 
 import java.time.LocalDateTime;
 import java.util.List;
