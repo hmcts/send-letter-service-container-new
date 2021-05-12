@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.sendletter.config.AccessTokenProperties;
 import uk.gov.hmcts.reform.sendletter.model.in.ManifestBlobInfo;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Optional;
 
 @Component
@@ -27,6 +28,7 @@ public class BlobReader {
     public Optional<ManifestBlobInfo> retrieveManifestsToProcess() {
         LOG.info("About to read manifests details");
         var containers = new ArrayList<>(accessTokenProperties.getServiceConfig());
+        Collections.shuffle(containers);
 
         for (AccessTokenProperties.TokenConfig config : containers) {
             String serviceName = config.getServiceName();
