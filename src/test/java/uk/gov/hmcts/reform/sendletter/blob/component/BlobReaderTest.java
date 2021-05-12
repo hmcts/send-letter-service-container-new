@@ -8,17 +8,20 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.sendletter.config.AccessTokenProperties;
+import uk.gov.hmcts.reform.sendletter.model.in.ManifestBlobInfo;
 
+import java.util.Optional;
 import java.util.stream.Stream;
 
+import static java.util.Collections.singletonList;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
-@SuppressWarnings("unchecked")
 class BlobReaderTest {
 
-    private static final String CONTAINER_1 = "new";
+    private static final String CONTAINER_1 = "new-sscs";
 
     @Mock private BlobManager blobManager;
     @Mock private BlobContainerClient blobContainerClient;
@@ -27,19 +30,34 @@ class BlobReaderTest {
     @Mock PagedIterable<BlobItem> mockedPagedIterable;
 
     private BlobReader blobReader;
+    private AccessTokenProperties accessTokenProperties;
 
     @BeforeEach
     void setUp() {
-        blobReader = new BlobReader(blobManager);
+        createAccessTokenConfig();
+        blobReader = new BlobReader(blobManager, accessTokenProperties);
     }
 
     @Test
     void should_list_blob_name()  {
         given(blobManager.getContainerClient(CONTAINER_1)).willReturn(blobContainerClient);
         given(blobContainerClient.listBlobs()).willReturn(mockedPagedIterable);
-        given(mockedBlobItem.getName()).willReturn("test.zip");
-        given(mockedPagedIterable.stream()).willReturn(Stream.of(mockedBlobItem));
-        String blob = blobReader.retrieveFileToProcess();
-        assertThat(blob).isEqualTo("test.zip");
+        given(mockedBlobItem.getName()).willReturn("manifests-xyz.json");
+        given(mockedPagedIterable.stream().filter(m -> m.getName().startsWith("manifests")))
+                .willReturn(Stream.of(mockedBlobItem));
+        Optional<ManifestBlobInfo> manifestBlobInfo = blobReader.retrieveManifestsToProcess();
+
+        assertThat(manifestBlobInfo.get().getBlobName()).isEqualTo("manifests-xyz.json");
+        assertThat(manifestBlobInfo.get().getServiceName()).isEqualTo("sscs");
+        assertThat(manifestBlobInfo.get().getContainerName()).isEqualTo("new-sscs");
+    }
+
+    private void createAccessTokenConfig() {
+        AccessTokenProperties.TokenConfig tokenConfig = new AccessTokenProperties.TokenConfig();
+        tokenConfig.setValidity(300);
+        tokenConfig.setServiceName("sscs");
+        tokenConfig.setNewContainerName(CONTAINER_1);
+        accessTokenProperties = new AccessTokenProperties();
+        accessTokenProperties.setServiceConfig(singletonList(tokenConfig));
     }
 }

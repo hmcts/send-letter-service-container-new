@@ -1,44 +1,89 @@
 package uk.gov.hmcts.reform.sendletter.blob.component;
 
 import com.azure.storage.blob.BlobClientBuilder;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.sendletter.model.in.Document;
+import uk.gov.hmcts.reform.sendletter.model.in.ManifestBlobInfo;
+import uk.gov.hmcts.reform.sendletter.model.in.PrintResponse;
 import uk.gov.hmcts.reform.sendletter.services.SasTokenGeneratorService;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 @Component
 public class BlobBackup {
 
     private static final Logger LOG = LoggerFactory.getLogger(BlobBackup.class);
-
     private final SasTokenGeneratorService sasTokenGeneratorService;
     private final BlobManager blobManager;
-    private static final String NEW_CONTAINER = "new";
+    private final ObjectMapper mapper;
     private static final String BACKUP_CONTAINER = "backup";
 
-    public BlobBackup(BlobManager blobManager, SasTokenGeneratorService sasTokenGeneratorService) {
+    public BlobBackup(BlobManager blobManager, SasTokenGeneratorService sasTokenGeneratorService, ObjectMapper mapper) {
         this.blobManager =  blobManager;
         this.sasTokenGeneratorService  = sasTokenGeneratorService;
+        this.mapper = mapper;
     }
 
-    public String backupBlob(String originalBlob) {
+    public PrintResponse backupBlobs(ManifestBlobInfo blobInfo) {
+        PrintResponse printResponse = null;
+        var destDirectory = "./data/";
+        try {
+            var serviceName = blobInfo.getServiceName();
+            var containerName = blobInfo.getContainerName();
+            var fileName = blobInfo.getBlobName();
+
+            LOG.info("getPdfInfo serviceName {}, containerName {}, blobName {}", serviceName, containerName, fileName);
+            var sasToken = sasTokenGeneratorService.generateSasToken(blobInfo.getServiceName());
+            LOG.info("sasToken code: {}", sasToken);
+            var  sourceBlobClient = blobManager.getBlobClient(containerName, sasToken, fileName);
+
+            var blobFile = destDirectory + fileName;
+            sourceBlobClient.downloadToFile(blobFile);
+
+            var file =  new File(blobFile);
+            printResponse = mapper.readValue(file, PrintResponse.class);
+
+            if (printResponse != null && printResponse.printJob != null && printResponse.printJob.documents != null) {
+                for (Document m : printResponse.printJob.documents) {
+                    var pdfFile = m.uploadToPath;
+                    LOG.info("Document FileName {}, NoOfCopies {}, uploadToPath {}", m.fileName, m.copies, pdfFile);
+                    doBackup(pdfFile, sasToken, containerName);
+                }
+                doBackup(fileName, sasToken, containerName);
+            }
+            cleanUp(file);
+
+        } catch (IOException e) {
+            LOG.error("Error occured while performing backup", e);
+        }
+        return printResponse;
+    }
+
+    private void cleanUp(File file) throws IOException {
+        var path = Path.of(file.getAbsolutePath());
+        Files.delete(path);
+    }
+
+    private void doBackup(String pdfFile, String sasToken, String sourceContainerName) {
         LOG.info("About to backup original blob in backup container");
 
         var destContainerClient = blobManager.getContainerClient(BACKUP_CONTAINER);
-        var sasToken = sasTokenGeneratorService.generateSasToken("bulkprint");
-        LOG.info("BlobBackup:: sasToken: {}", sasToken);
-
         var sourceBlobClient = new BlobClientBuilder()
                 .endpoint(blobManager.getAccountUrl())
                 .sasToken(sasToken)
-                .containerName(NEW_CONTAINER)
-                .blobName(originalBlob)
+                .containerName(sourceContainerName)
+                .blobName(pdfFile)
                 .buildClient();
 
-        var destBlobClient = destContainerClient.getBlobClient(originalBlob);
-        String copyId = destBlobClient.copyFromUrl(sourceBlobClient.getBlobUrl() + "?" + sasToken);
-        LOG.info("Blob backup complete copy id {} ", copyId);
-        return copyId;
+        var destBlobClient = destContainerClient.getBlobClient(pdfFile);
+        var blob = sourceBlobClient.getBlobUrl();
+        destBlobClient.copyFromUrl(blob + "?" + sasToken);
+        LOG.info("Blob {} backup completed.", blob);
     }
-
 }

@@ -5,6 +5,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sendletter.blob.component.BlobBackup;
 import uk.gov.hmcts.reform.sendletter.blob.component.BlobReader;
+import uk.gov.hmcts.reform.sendletter.model.in.ManifestBlobInfo;
+
+import java.util.Optional;
 
 @Service
 public class BlobProcessor {
@@ -19,9 +22,13 @@ public class BlobProcessor {
     }
 
     public boolean read() throws InterruptedException {
-        String blob = blobReader.retrieveFileToProcess();
-        blobBackup.backupBlob(blob);
-        LOG.info("BlobName : {}", blob);
+        Optional<ManifestBlobInfo> blobInfo = blobReader.retrieveManifestsToProcess();
+
+        if (blobInfo.isPresent()) {
+            var printResponse = blobBackup.backupBlobs(blobInfo.get());
+            LOG.info("PrintResponse {}", printResponse);
+        }
+
         Thread.sleep(10_000);
         return true;
     }

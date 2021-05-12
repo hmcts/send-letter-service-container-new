@@ -92,10 +92,11 @@ checkstyle {
 
 pmd {
   toolVersion = "6.19.0"
+  ignoreFailures = true
+  incrementalAnalysis = true
   sourceSets = [sourceSets.main, sourceSets.test, sourceSets.functionalTest, sourceSets.integrationTest, sourceSets.smokeTest]
   reportsDir = file("$project.buildDir/reports/pmd")
   // https://github.com/pmd/pmd/issues/876
-  ruleSets = []
   ruleSetFiles = files("config/pmd/ruleset.xml")
 }
 
@@ -110,6 +111,7 @@ jacocoTestReport {
     getClassDirectories().from = getClassDirectories().files.collect {
       fileTree(dir: it, exclude: [
         'uk/gov/hmcts/reform/sendletter/config/**',
+        'uk/gov/hmcts/reform/sendletter/model/**',
         'uk/gov/hmcts/reform/sendletter/Application.*'
       ])
     }
@@ -127,7 +129,7 @@ sonarqube {
     property "sonar.projectName", "Reform :: rpe-send-letter-service-container-new"
     property "sonar.projectKey", "uk.gov.hmcts.reform:rpe-send-letter-service-container-new"
     property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
-    property "sonar.exclusions", "**/model/out/*,**/config/**"
+    property "sonar.exclusions", "**/model/in/*,**/config/**"
     property "sonar.test.exclusions", sonarExclusions.join(", ")
     property "sonar.coverage.exclusions", sonarExclusions.join(", ")
   }
@@ -196,6 +198,7 @@ repositories {
 def versions = [
   junit           : '5.7.1',
   junitPlatform   : '1.7.1',
+  springfoxSwagger: '2.9.2',
   mockitoJupiter  : '3.3.3',
   reformLogging   : '5.1.7'
 ]
@@ -212,10 +215,15 @@ ext.libraries = [
 
 dependencies {
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter'
+  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
   implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '11.0'
   implementation group: 'uk.gov.hmcts.reform', name: 'logging', version: versions.reformLogging
   implementation group: 'uk.gov.hmcts.reform', name: 'logging-appinsights', version: versions.reformLogging
+
   implementation group: 'com.azure', name: 'azure-storage-blob', version: '12.10.2'
+
+  implementation group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
+  implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger
 
   compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.14.1'
   compile group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.14.1'
