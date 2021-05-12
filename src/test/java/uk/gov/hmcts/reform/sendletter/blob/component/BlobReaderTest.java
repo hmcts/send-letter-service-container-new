@@ -74,7 +74,7 @@ class BlobReaderTest {
         given(mockedPagedIterable.stream().filter(m -> m.getName().startsWith("manifest")))
                 .willReturn(Stream.of(mockedBlobItem));
         Optional<ManifestBlobInfo> manifestBlobInfo = blobReader.retrieveManifestsToProcess();
-        assertThat(manifestBlobInfo).isEqualTo(Optional.empty());
+        assertThat(manifestBlobInfo).isNotPresent();
     }
 
     private void createAccessTokenConfig() {
