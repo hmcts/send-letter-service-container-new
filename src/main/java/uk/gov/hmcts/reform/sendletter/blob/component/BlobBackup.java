@@ -32,7 +32,7 @@ public class BlobBackup {
 
     public PrintResponse backupBlobs(ManifestBlobInfo blobInfo) {
         PrintResponse printResponse = null;
-        var destDirectory = "./data/";
+        var destDirectory = "/var/tmp/";
         try {
             var serviceName = blobInfo.getServiceName();
             var containerName = blobInfo.getContainerName();

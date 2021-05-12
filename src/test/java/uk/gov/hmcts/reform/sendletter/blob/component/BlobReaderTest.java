@@ -43,13 +43,38 @@ class BlobReaderTest {
         given(blobManager.getContainerClient(CONTAINER_1)).willReturn(blobContainerClient);
         given(blobContainerClient.listBlobs()).willReturn(mockedPagedIterable);
         given(mockedBlobItem.getName()).willReturn("manifests-xyz.json");
-        given(mockedPagedIterable.stream().filter(m -> m.getName().startsWith("manifests")))
+        given(mockedPagedIterable.stream().filter(m -> m.getName().startsWith("manifest")))
                 .willReturn(Stream.of(mockedBlobItem));
         Optional<ManifestBlobInfo> manifestBlobInfo = blobReader.retrieveManifestsToProcess();
 
         assertThat(manifestBlobInfo.get().getBlobName()).isEqualTo("manifests-xyz.json");
         assertThat(manifestBlobInfo.get().getServiceName()).isEqualTo("sscs");
         assertThat(manifestBlobInfo.get().getContainerName()).isEqualTo("new-sscs");
+    }
+
+    @Test
+    void should_list_blob_name_without_slash()  {
+        given(blobManager.getContainerClient(CONTAINER_1)).willReturn(blobContainerClient);
+        given(blobContainerClient.listBlobs()).willReturn(mockedPagedIterable);
+        given(mockedBlobItem.getName()).willReturn("manifest-/manifests-xyz.json");
+        given(mockedPagedIterable.stream().filter(m -> m.getName().startsWith("manifest")))
+                .willReturn(Stream.of(mockedBlobItem));
+        Optional<ManifestBlobInfo> manifestBlobInfo = blobReader.retrieveManifestsToProcess();
+
+        assertThat(manifestBlobInfo.get().getBlobName()).isEqualTo("manifests-xyz.json");
+        assertThat(manifestBlobInfo.get().getServiceName()).isEqualTo("sscs");
+        assertThat(manifestBlobInfo.get().getContainerName()).isEqualTo("new-sscs");
+    }
+
+    @Test
+    void should_not_list_blob_name()  {
+        given(blobManager.getContainerClient(CONTAINER_1)).willReturn(blobContainerClient);
+        given(blobContainerClient.listBlobs()).willReturn(mockedPagedIterable);
+        given(mockedBlobItem.getName()).willReturn("abc-/manifests-xyz.json");
+        given(mockedPagedIterable.stream().filter(m -> m.getName().startsWith("manifest")))
+                .willReturn(Stream.of(mockedBlobItem));
+        Optional<ManifestBlobInfo> manifestBlobInfo = blobReader.retrieveManifestsToProcess();
+        assertThat(manifestBlobInfo).isNotPresent();
     }
 
     private void createAccessTokenConfig() {
