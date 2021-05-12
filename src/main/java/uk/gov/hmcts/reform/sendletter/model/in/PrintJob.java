@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sendletter.model.in;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.LocalDateTime;
@@ -10,12 +11,15 @@ public class PrintJob {
     public final UUID id;
 
     @JsonProperty("created_at")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     public final LocalDateTime createdAt;
 
     @JsonProperty("printed_at")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     public final LocalDateTime printedAt;
 
     @JsonProperty("sent_to_print_at")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     public final LocalDateTime sentToPrintAt;
 
     public final String service;
