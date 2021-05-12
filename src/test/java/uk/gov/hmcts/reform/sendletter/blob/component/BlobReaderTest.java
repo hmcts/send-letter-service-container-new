@@ -42,8 +42,8 @@ class BlobReaderTest {
     void should_list_blob_name()  {
         given(blobManager.getContainerClient(CONTAINER_1)).willReturn(blobContainerClient);
         given(blobContainerClient.listBlobs()).willReturn(mockedPagedIterable);
-        given(mockedBlobItem.getName()).willReturn("manifests-xyz.json");
-        given(mockedPagedIterable.stream().filter(m -> m.getName().startsWith("manifests")))
+        given(mockedBlobItem.getName()).willReturn("manifest-/manifests-xyz.json");
+        given(mockedPagedIterable.stream().filter(m -> m.getName().startsWith("manifest")))
                 .willReturn(Stream.of(mockedBlobItem));
         Optional<ManifestBlobInfo> manifestBlobInfo = blobReader.retrieveManifestsToProcess();
 
