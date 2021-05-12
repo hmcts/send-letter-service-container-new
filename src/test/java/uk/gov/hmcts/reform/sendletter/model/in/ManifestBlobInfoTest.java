@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sendletter.model.in;
 
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.reform.sendletter.model.in.ManifestBlobInfo;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

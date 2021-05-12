@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-import javax.validation.Valid;
 
 public class PrintJob {
     public final UUID id;
@@ -24,7 +23,7 @@ public class PrintJob {
     @JsonProperty("status")
     public final PrintStatus printStatus;
 
-    public final List<@Valid Document> documents;
+    public final List<Document> documents;
 
     @JsonProperty("case_id")
     public final String caseId;
@@ -56,7 +55,7 @@ public class PrintJob {
                     LocalDateTime sentToPrintAt,
                     String service,
                     PrintStatus printStatus,
-                    List<@Valid Document> documents,
+                    List<Document> documents,
                     String caseId,
                     String caseRef,
                     String letterType) {
