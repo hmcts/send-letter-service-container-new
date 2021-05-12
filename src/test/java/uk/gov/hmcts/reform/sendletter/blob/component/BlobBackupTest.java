@@ -39,7 +39,7 @@ class BlobBackupTest {
 
     private static final String NEW_CONTAINER = "new-sscs";
     private static final String BACKUP_CONTAINER = "backup";
-    private static final String BLOB_NAME = "print_job_response.json";
+    private static final String BLOB_NAME = "manifest-/print_job_response.json";
     private static final String TEST_SERVICE_NAME = "sscs";
 
     private AccessTokenProperties accessTokenProperties;
@@ -57,6 +57,7 @@ class BlobBackupTest {
     private BlobBackup blobBackup;
     private ManifestBlobInfo blobInfo;
     private ObjectMapper mapper;
+    private String sasToken;
 
     @BeforeEach
     void setUp() throws IOException {
@@ -78,7 +79,7 @@ class BlobBackupTest {
                 accessTokenProperties);
         blobBackup = new BlobBackup(blobManager, sasTokenGeneratorService, mapper);
 
-        String sasToken = sasTokenGeneratorService.generateSasToken(TEST_SERVICE_NAME);
+        sasToken = sasTokenGeneratorService.generateSasToken(TEST_SERVICE_NAME);
 
         sourceBlobClient = new BlobClientBuilder()
                 .endpoint(blobManager.getAccountUrl())
@@ -91,7 +92,7 @@ class BlobBackupTest {
     }
 
     @Test
-    void should_copy_blob_from_new_container_to_backup_container() throws IOException {
+    void should_copy_blob_with_path_from_new_container_to_backup_container() throws IOException {
 
         given(blobManager.getContainerClient(BACKUP_CONTAINER)).willReturn(destContainerClient);
         given(destBlobClient
@@ -119,6 +120,43 @@ class BlobBackupTest {
         assertThat(response.printJob.printStatus).isSameAs(PrintStatus.PROCESSED);
     }
 
+    @Test
+    void should_copy_blob_without_from_new_container_to_backup_container() throws IOException {
+        String blobName = "print_job_response.json";
+        sourceBlobClient = new BlobClientBuilder()
+                .endpoint(blobManager.getAccountUrl())
+                .sasToken(sasToken)
+                .containerName(NEW_CONTAINER)
+                .blobName(blobName)
+                .buildClient();
+
+        blobInfo = new ManifestBlobInfo(TEST_SERVICE_NAME, NEW_CONTAINER, blobName);
+
+        given(blobManager.getContainerClient(BACKUP_CONTAINER)).willReturn(destContainerClient);
+        given(destBlobClient
+                .copyFromUrl("33dffc2f-94e0-4584-a973-cc56849ecc0b-sscs-SSC001-mypdf.pdf"
+                        + "?" + anyString())).willReturn("id");
+        given(destBlobClient
+                .copyFromUrl("33dffc2f-94e0-4584-a973-cc56849ecc0b-sscs-SSC001-2.pdf"
+                        + "?" + anyString())).willReturn("id");
+        given(destBlobClient.copyFromUrl(sourceBlobClient.getBlobUrl() + "?" + anyString())).willReturn("id");
+        given(destContainerClient.getBlobClient(anyString())).willReturn(destBlobClient);
+
+        given(blobManager.getBlobClient(any(), any(), any())).willReturn(client);
+        mapper = spy(mapper);
+        String json = Resources.toString(getResource("print_job_response.json"), UTF_8);
+        mapper.registerModule(new JavaTimeModule());
+        PrintResponse printResponse = mock(PrintResponse.class);
+
+        FileWriter myWriter = new FileWriter("/var/tmp/print_job_response.json");
+        myWriter.write(json);
+        myWriter.close();
+
+        lenient().when(mapper.readValue(json, PrintResponse.class)).thenReturn(printResponse);
+
+        PrintResponse response = blobBackup.backupBlobs(blobInfo);
+        assertThat(response.printJob.printStatus).isSameAs(PrintStatus.PROCESSED);
+    }
 
     private void createAccessTokenConfig() {
         AccessTokenProperties.TokenConfig tokenConfig = new AccessTokenProperties.TokenConfig();
