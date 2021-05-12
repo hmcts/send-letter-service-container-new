@@ -43,7 +43,7 @@ public class BlobBackup {
             LOG.info("sasToken code: {}", sasToken);
             var  sourceBlobClient = blobManager.getBlobClient(containerName, sasToken, fileName);
 
-            var blobFile = destDirectory + fileName;
+            var blobFile = destDirectory + removeSlashFromBlobName(fileName);
             sourceBlobClient.downloadToFile(blobFile);
 
             var file =  new File(blobFile);
@@ -85,5 +85,13 @@ public class BlobBackup {
         var blob = sourceBlobClient.getBlobUrl();
         destBlobClient.copyFromUrl(blob + "?" + sasToken);
         LOG.info("Blob {} backup completed.", blob);
+    }
+
+    //This is only for download locally in /var/tmp.
+    private String removeSlashFromBlobName(String filename) {
+        if (filename.contains("/")) {
+            return filename.substring(filename.lastIndexOf("/") + 1);
+        }
+        return filename;
     }
 }

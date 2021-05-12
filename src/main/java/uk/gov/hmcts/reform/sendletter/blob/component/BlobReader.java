@@ -42,17 +42,10 @@ public class BlobReader {
             if (blobName.isPresent()) {
                 LOG.info("BlobReader:: ServiceName {}, Container {}, Blob name: {}", serviceName,
                         containerName, blobName.get());
-                return Optional.of(new ManifestBlobInfo(serviceName, containerName, getCleanName(blobName.get())));
+                return Optional.of(new ManifestBlobInfo(serviceName, containerName, blobName.get()));
             }
         }
 
         return Optional.empty();
-    }
-
-    private String getCleanName(String filename) {
-        if (filename.contains("/")) {
-            return filename.substring(filename.lastIndexOf("/") + 1);
-        }
-        return filename;
     }
 }
