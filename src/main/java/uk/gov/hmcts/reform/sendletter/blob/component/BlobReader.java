@@ -51,7 +51,7 @@ public class BlobReader {
 
     private String getCleanName(String filename) {
         if (filename.contains("/")) {
-            return filename.substring(filename.lastIndexOf("/")+1);
+            return filename.substring(filename.lastIndexOf("/") + 1);
         }
         return filename;
     }
