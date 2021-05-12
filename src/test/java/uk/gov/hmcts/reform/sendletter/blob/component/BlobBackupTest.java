@@ -109,7 +109,7 @@ class BlobBackupTest {
         mapper.registerModule(new JavaTimeModule());
         PrintResponse printResponse = mock(PrintResponse.class);
 
-        FileWriter myWriter = new FileWriter("./data/print_job_response.json");
+        FileWriter myWriter = new FileWriter("/var/tmp/print_job_response.json");
         myWriter.write(json);
         myWriter.close();
 
