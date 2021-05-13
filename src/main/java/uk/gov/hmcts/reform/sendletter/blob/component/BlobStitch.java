@@ -62,10 +62,10 @@ public class BlobStitch {
                     printResponse.printJob.id);
 
             //pdf file with local file location
-            var finalPdfPdf = destDirectory + finalPdfName;
+            var finalPdfPath = destDirectory + finalPdfName;
 
             // Create final pdf file from byte[] .e.g stitched
-            var fileOutputStream = new FileOutputStream(finalPdfPdf);
+            var fileOutputStream = new FileOutputStream(finalPdfPath);
             fileOutputStream.write(pdfCreator.createFromBase64PdfWithCopies(docs));
             fileOutputStream.close();
 
@@ -78,11 +78,11 @@ public class BlobStitch {
             LOG.info("Uploading to Blob storage as blob: {}", blobClient.getBlobUrl());
 
             // Upload the blob
-            blobClient.uploadFromFile(finalPdfPdf);
+            blobClient.uploadFromFile(finalPdfPath);
             LOG.info("Uploaded blob {} to Blob storage completed.", blobClient.getBlobUrl());
 
             // delete pdf from local
-            cleanUp(finalPdfPdf);
+            cleanUp(finalPdfPath);
         }
     }
 
