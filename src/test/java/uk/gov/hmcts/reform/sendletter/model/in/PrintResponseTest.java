@@ -66,7 +66,7 @@ class PrintResponseTest {
 
         PrintUploadInfo printUploadInfo = printResponse.printUploadInfo;
         assertThat(printUploadInfo.uploadToContainer)
-                .isEqualTo("url");
+                .isEqualTo("https://blobstoreurl.com/new-sscs");
         assertThat(printUploadInfo.sasToken)
                 .isEqualTo("?sas=sadas56tfuvydasd");
         assertThat(printUploadInfo.manifestPath)
