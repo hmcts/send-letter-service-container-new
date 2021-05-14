@@ -24,7 +24,7 @@ public class DuplexPreparator {
             if (pdDoc.getNumberOfPages() % 2 == 1) {
                 PDRectangle lastPageMediaBox = pdDoc.getPage(pdDoc.getNumberOfPages() - 1).getMediaBox();
                 pdDoc.addPage(new PDPage(lastPageMediaBox));
-                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                var out = new ByteArrayOutputStream();
                 pdDoc.save(out);
 
                 return out.toByteArray();

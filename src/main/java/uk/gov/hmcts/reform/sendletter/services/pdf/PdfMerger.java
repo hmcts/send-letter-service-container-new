@@ -29,7 +29,7 @@ public final class PdfMerger {
             .map(ByteArrayInputStream::new)
             .collect(toList());
 
-        PDFMergerUtility pdfMergerUtility = new PDFMergerUtility();
+        var pdfMergerUtility = new PDFMergerUtility();
         pdfMergerUtility.addSources(inputStreams);
         pdfMergerUtility.setDestinationStream(docOutputStream);
 

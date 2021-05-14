@@ -64,8 +64,8 @@ class PdfCreatorTest {
         byte[] result = pdfCreator.createFromBase64PdfWithCopies(asList(doc1, doc2));
 
         // then
-        verify(duplexPreparator, times(1)).prepare(eq(doc1.content));
-        verify(duplexPreparator, times(1)).prepare(eq(doc2.content));
+        verify(duplexPreparator, times(1)).prepare(doc1.content);
+        verify(duplexPreparator, times(1)).prepare(doc2.content);
 
         try (PDDocument doc = PDDocument.load(result)) {
             assertThat(doc.getNumberOfPages()).isEqualTo(doc1.copies + doc2.copies);

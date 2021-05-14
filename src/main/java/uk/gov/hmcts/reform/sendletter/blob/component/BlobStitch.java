@@ -27,7 +27,7 @@ public class BlobStitch {
     private final SasTokenGeneratorService sasTokenGeneratorService;
     private final BlobManager blobManager;
     private static final String SEPARATOR = "_";
-    private static final String destDirectory = "/var/tmp/";
+    private static final String DEST_DIRECTORY = "/var/tmp/";
 
     public BlobStitch(BlobManager blobManager, SasTokenGeneratorService sasTokenGeneratorService,
                       PdfCreator pdfCreator) {
@@ -60,12 +60,12 @@ public class BlobStitch {
                     printResponse.printJob.id);
 
             //pdf file with local file location
-            var finalPdfPath = destDirectory + finalPdfName;
+            var finalPdfPath = DEST_DIRECTORY + finalPdfName;
 
             // Create final pdf file from byte[] .e.g stitched
-            var fileOutputStream = new FileOutputStream(finalPdfPath);
-            fileOutputStream.write(pdfCreator.createFromBase64PdfWithCopies(docs));
-            fileOutputStream.close();
+            try (var fileOutputStream = new FileOutputStream(finalPdfPath)) {
+                fileOutputStream.write(pdfCreator.createFromBase64PdfWithCopies(docs));
+            }
 
             // Create the container and return a container client object
             var containerClient = blobManager.getContainerClient("processed");
@@ -87,10 +87,10 @@ public class BlobStitch {
     private Doc getPdfDocuments(String containerName, String sasToken, Document document) throws IOException {
         var fileName = document.uploadToPath;
         var sourceBlobClient = blobManager.getBlobClient(containerName, sasToken, fileName);
-        sourceBlobClient.downloadToFile(destDirectory + fileName, true);
-        var path = Paths.get(destDirectory + fileName);
+        sourceBlobClient.downloadToFile(DEST_DIRECTORY + fileName, true);
+        var path = Paths.get(DEST_DIRECTORY + fileName);
         byte[] bytes = Files.readAllBytes(path);
-        cleanUp(destDirectory + fileName);
+        cleanUp(DEST_DIRECTORY + fileName);
         return new Doc(bytes, document.copies);
     }
 

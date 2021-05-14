@@ -25,13 +25,13 @@ public class BlobProcessor {
         this.blobStitch = blobStitch;
     }
 
-    public boolean read() throws InterruptedException, IOException {
+    public boolean read() throws IOException {
         Optional<ManifestBlobInfo> blobInfo = blobReader.retrieveManifestsToProcess();
 
         if (blobInfo.isPresent()) {
             var printResponse = blobBackup.backupBlobs(blobInfo.get());
+            LOG.info("BlobProcessor:: PrintResponse {}", printResponse);
             blobStitch.stitchBlobs(printResponse);
-            LOG.info("PrintResponse {}", printResponse);
         }
 
         return true;

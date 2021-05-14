@@ -11,6 +11,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class DuplexPreparatorTest {
 
+    private static void call() {
+        new DuplexPreparator().prepare("corruptedStream".getBytes());
+    }
+
     @Test
     void should_add_blank_page_if_total_number_of_pages_is_odd() throws Exception {
         // given
@@ -40,7 +44,7 @@ class DuplexPreparatorTest {
 
     @Test
     void should_throw_duplex_exception_when_stream_is_not_pdf() {
-        assertThatThrownBy(() -> new DuplexPreparator().prepare("corruptedStream".getBytes()))
+        assertThatThrownBy(DuplexPreparatorTest::call)
                 .isInstanceOf(DuplexException.class);
     }
 }

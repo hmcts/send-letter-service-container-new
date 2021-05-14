@@ -27,8 +27,8 @@ public class Application implements CommandLineRunner {
         try {
             LOGGER.info("send letter new KEDA container invoked");
             retrieve.read();
-        } catch (InterruptedException | IOException e) {
-            Thread.currentThread().interrupt();
+        } catch (IOException e) {
+            LOGGER.info("Exception occured while KEDA container invoked", e);
         }
     }
 }
