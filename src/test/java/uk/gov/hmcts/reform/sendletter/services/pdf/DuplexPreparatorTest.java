@@ -4,6 +4,8 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.sendletter.exceptions.DuplexException;
 
+import java.io.IOException;
+
 import static com.google.common.io.Resources.getResource;
 import static com.google.common.io.Resources.toByteArray;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -45,6 +47,6 @@ class DuplexPreparatorTest {
     @Test
     void should_throw_duplex_exception_when_stream_is_not_pdf() {
         assertThatThrownBy(DuplexPreparatorTest::call)
-                .isInstanceOf(DuplexException.class);
+            .isInstanceOfAny(IOException.class, DuplexException.class);
     }
 }
