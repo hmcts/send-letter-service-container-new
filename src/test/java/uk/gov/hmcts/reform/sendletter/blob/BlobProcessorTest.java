@@ -20,6 +20,7 @@ import java.util.Optional;
 import static com.google.common.base.Charsets.UTF_8;
 import static com.google.common.io.Resources.getResource;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
@@ -54,10 +55,14 @@ class BlobProcessorTest {
     @Test
     void should_process_blob_when_triggered() throws InterruptedException, IOException {
         boolean processed = processBlob.read();
-        verify(blobReader).retrieveManifestsToProcess();
-        PrintResponse printResponse = blobBackup.backupBlobs(blobInfo);
-
         assertThat(processed).isTrue();
+        verify(blobReader).retrieveManifestsToProcess();
+
+        PrintResponse printResponse = blobBackup.backupBlobs(blobInfo);
+        assertNotNull(printResponse);
+        assertNotNull(printResponse.printJob);
+        assertNotNull(printResponse.printUploadInfo);
+        assertNotNull(printResponse.printUploadInfo.uploadToContainer);
         assertThat(printResponse.printUploadInfo.manifestPath)
                 .isEqualTo("manifest-33dffc2f-94e0-4584-a973-cc56849ecc0b-sscs.json");
 
