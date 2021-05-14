@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.sendletter.blob.component;
 
-import com.azure.storage.blob.BlobClient;
-import com.azure.storage.blob.BlobContainerClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -70,10 +68,10 @@ public class BlobStitch {
             fileOutputStream.close();
 
             // Create the container and return a container client object
-            BlobContainerClient containerClient = blobManager.getContainerClient("processed");
+            var containerClient = blobManager.getContainerClient("processed");
 
             // Get a reference to a blob
-            BlobClient blobClient = containerClient.getBlobClient(finalPdfName);
+            var blobClient = containerClient.getBlobClient(finalPdfName);
 
             LOG.info("Uploading to Blob storage as blob: {}", blobClient.getBlobUrl());
 
@@ -87,9 +85,9 @@ public class BlobStitch {
     }
 
     private Doc getPdfDocuments(String containerName, String sasToken, Document document) throws IOException {
-        var fileName = document.fileName;
+        var fileName = document.uploadToPath;
         var sourceBlobClient = blobManager.getBlobClient(containerName, sasToken, fileName);
-        sourceBlobClient.downloadToFile(destDirectory + fileName);
+        sourceBlobClient.downloadToFile(destDirectory + fileName, true);
         var path = Paths.get(destDirectory + fileName);
         byte[] bytes = Files.readAllBytes(path);
         cleanUp(destDirectory + fileName);

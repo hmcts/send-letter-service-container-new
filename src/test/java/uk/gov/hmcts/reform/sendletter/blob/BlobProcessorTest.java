@@ -10,6 +10,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sendletter.blob.component.BlobBackup;
 import uk.gov.hmcts.reform.sendletter.blob.component.BlobReader;
+import uk.gov.hmcts.reform.sendletter.blob.component.BlobStitch;
 import uk.gov.hmcts.reform.sendletter.model.in.ManifestBlobInfo;
 import uk.gov.hmcts.reform.sendletter.model.in.PrintResponse;
 
@@ -30,6 +31,8 @@ class BlobProcessorTest {
     private BlobReader blobReader;
     @Mock
     private BlobBackup blobBackup;
+    @Mock
+    private BlobStitch blobStitch;
 
     private ManifestBlobInfo blobInfo;
 
@@ -37,7 +40,7 @@ class BlobProcessorTest {
     void setUp() throws IOException {
         blobInfo = new ManifestBlobInfo("sscs", "new-sscs",
                 "manifests-xyz.json");
-        processBlob = new BlobProcessor(blobReader, blobBackup);
+        processBlob = new BlobProcessor(blobReader, blobBackup, blobStitch);
         given(blobReader.retrieveManifestsToProcess()).willReturn(Optional.of(blobInfo));
 
         String json = Resources.toString(getResource("print_job_response.json"), UTF_8);
@@ -49,7 +52,7 @@ class BlobProcessorTest {
     }
 
     @Test
-    void should_process_blob_when_triggered() throws InterruptedException {
+    void should_process_blob_when_triggered() throws InterruptedException, IOException {
         boolean processed = processBlob.read();
         verify(blobReader).retrieveManifestsToProcess();
         PrintResponse printResponse = blobBackup.backupBlobs(blobInfo);
@@ -57,5 +60,7 @@ class BlobProcessorTest {
         assertThat(processed).isTrue();
         assertThat(printResponse.printUploadInfo.manifestPath)
                 .isEqualTo("manifest-33dffc2f-94e0-4584-a973-cc56849ecc0b-sscs.json");
+
+        verify(blobStitch).stitchBlobs(printResponse);
     }
 }
