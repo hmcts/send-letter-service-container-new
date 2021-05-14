@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.sendletter.services.pdf;
 
 import org.apache.http.util.Asserts;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sendletter.model.in.Doc;
 import uk.gov.hmcts.reform.sendletter.model.in.PdfDocument;
@@ -15,7 +13,7 @@ import static java.util.stream.Collectors.toList;
 
 @Service
 public class PdfCreator {
-    private static final Logger logger = LoggerFactory.getLogger(PdfCreator.class);
+
     private final DuplexPreparator duplexPreparator;
     private final IHtmlToPdfConverter converter;
 
