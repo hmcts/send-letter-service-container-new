@@ -25,6 +25,7 @@ import java.io.IOException;
 import static com.google.common.base.Charsets.UTF_8;
 import static com.google.common.io.Resources.getResource;
 import static java.util.Collections.singletonList;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -113,6 +114,8 @@ class BlobStitchTest {
         lenient().when(mapper.readValue(json, PrintResponse.class)).thenReturn(mockResponse);
 
         blobStitch.stitchBlobs(response);
+
+        assertThat(response.printJob.documents.size()).isEqualTo(2);
     }
 
 

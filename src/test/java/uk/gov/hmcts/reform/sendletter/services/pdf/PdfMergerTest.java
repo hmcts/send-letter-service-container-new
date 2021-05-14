@@ -16,6 +16,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class PdfMergerTest {
 
+    private static void call() {
+        PdfMerger.mergeDocuments(asList("test1".getBytes(), "test2".getBytes()));
+    }
+
     @Test
     void should_return_a_merged_pdf_when_multiple_documents_are_sent() throws IOException {
         //given
@@ -53,7 +57,7 @@ class PdfMergerTest {
 
     @Test
     void should_throw_pdf_merge_exception_when_doc_is_not_pdf_stream() {
-        assertThatThrownBy(() -> PdfMerger.mergeDocuments(asList("test1".getBytes(), "test2".getBytes())))
+        assertThatThrownBy(PdfMergerTest::call)
                 .isInstanceOf(PdfMergeException.class);
     }
 
