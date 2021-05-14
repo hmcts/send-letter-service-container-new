@@ -9,6 +9,7 @@ import com.azure.storage.common.StorageSharedKeyCredential;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.common.io.Resources;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,6 +27,7 @@ import static com.google.common.base.Charsets.UTF_8;
 import static com.google.common.io.Resources.getResource;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -115,6 +117,10 @@ class BlobStitchTest {
 
         blobStitch.stitchBlobs(response);
 
+        assertNotNull(response);
+        assertNotNull(response.printJob);
+        assertNotNull(response.printUploadInfo);
+        assertNotNull(response.printUploadInfo.uploadToContainer);
         assertThat(response.printJob.documents.size()).isEqualTo(2);
     }
 

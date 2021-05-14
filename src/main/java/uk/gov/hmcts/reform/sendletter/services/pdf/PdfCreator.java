@@ -53,7 +53,6 @@ public class PdfCreator {
 
         var pdfs = docs
             .stream()
-            .peek(doc -> logger.info("Number of copies request {}", doc.copies))
             .map(doc -> new Doc(duplexPreparator.prepare(doc.content), doc.copies))
             .map(d -> Collections.nCopies(d.copies, d.content))
             .flatMap(Collection::stream)
