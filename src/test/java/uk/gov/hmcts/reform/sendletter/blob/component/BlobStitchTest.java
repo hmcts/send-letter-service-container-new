@@ -119,7 +119,7 @@ class BlobStitchTest {
     }
 
     @Test
-    void should_not_return_stitch_blob_together() throws IOException {
+    void should_not_return_stitch_blob_together_when_response_is_null() throws IOException {
         mapper = spy(mapper);
         mapper.registerModule(new JavaTimeModule());
         PrintResponse mockResponse = mock(PrintResponse.class);
@@ -127,6 +127,70 @@ class BlobStitchTest {
         response = null;
         blobStitch.stitchBlobs(response);
         assertNull(response);
+    }
+
+    @Test
+    void should_not_return_stitch_blob_together_when_printjob_is_null() throws IOException {
+        json = Resources.toString(getResource("print_job_is_null.json"), UTF_8);
+        var objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        response = objectMapper.readValue(json, PrintResponse.class);
+
+        mapper = spy(mapper);
+        mapper.registerModule(new JavaTimeModule());
+        PrintResponse mockResponse = mock(PrintResponse.class);
+        lenient().when(mapper.readValue(json, PrintResponse.class)).thenReturn(mockResponse);
+
+        blobStitch.stitchBlobs(response);
+        assertNull(response.printJob);
+    }
+
+    @Test
+    void should_not_return_stitch_blob_together_when_documents_is_null() throws IOException {
+        json = Resources.toString(getResource("print_job_response_document_is_null.json"), UTF_8);
+        var objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        response = objectMapper.readValue(json, PrintResponse.class);
+
+        mapper = spy(mapper);
+        mapper.registerModule(new JavaTimeModule());
+        PrintResponse mockResponse = mock(PrintResponse.class);
+        lenient().when(mapper.readValue(json, PrintResponse.class)).thenReturn(mockResponse);
+
+        blobStitch.stitchBlobs(response);
+        assertNull(response.printJob.documents);
+    }
+
+    @Test
+    void should_not_return_stitch_blob_together_when_upload_info_is_null() throws IOException {
+        json = Resources.toString(getResource("print_job_upload_info_is_null.json"), UTF_8);
+        var objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        response = objectMapper.readValue(json, PrintResponse.class);
+
+        mapper = spy(mapper);
+        mapper.registerModule(new JavaTimeModule());
+        PrintResponse mockResponse = mock(PrintResponse.class);
+        lenient().when(mapper.readValue(json, PrintResponse.class)).thenReturn(mockResponse);
+
+        blobStitch.stitchBlobs(response);
+        assertNull(response.printUploadInfo);
+    }
+
+    @Test
+    void should_not_return_stitch_blob_together_when_upload_container_is_null() throws IOException {
+        json = Resources.toString(getResource("print_job_upload_to_container_is_null.json"), UTF_8);
+        var objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        response = objectMapper.readValue(json, PrintResponse.class);
+
+        mapper = spy(mapper);
+        mapper.registerModule(new JavaTimeModule());
+        PrintResponse mockResponse = mock(PrintResponse.class);
+        lenient().when(mapper.readValue(json, PrintResponse.class)).thenReturn(mockResponse);
+
+        blobStitch.stitchBlobs(response);
+        assertNull(response.printUploadInfo.uploadToContainer);
     }
 
 
