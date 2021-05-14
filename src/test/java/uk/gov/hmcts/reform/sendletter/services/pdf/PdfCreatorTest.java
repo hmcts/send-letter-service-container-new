@@ -108,6 +108,25 @@ class PdfCreatorTest {
         verify(duplexPreparator, times(2)).prepare(any(byte[].class));
     }
 
+    @Test
+    void should_handle_base64_encoded_pdfs() throws Exception {
+        // given
+        byte[] test1Pdf = toByteArray(getResource("test1.pdf"));
+        byte[] test2Pdf = toByteArray(getResource("test2.pdf"));
+
+        given(duplexPreparator.prepare(test1Pdf)).willReturn(test1Pdf);
+        given(duplexPreparator.prepare(test2Pdf)).willReturn(test2Pdf);
+
+        List<byte[]> pdfs = asList(test1Pdf, test2Pdf);
+
+        // when
+        byte[] pdfContent = pdfCreator.createFromBase64Pdfs(pdfs);
+
+        // then
+        assertThat(pdfContent).isNotNull();
+        // and no exception is thrown
+    }
+
     private InputStream getPdfPageContents(byte[] pdf, int pageNumber) throws Exception {
         try (PDDocument doc = PDDocument.load(pdf)) {
             byte[] data = ByteStreams.toByteArray(doc.getPage(pageNumber).getContents());
