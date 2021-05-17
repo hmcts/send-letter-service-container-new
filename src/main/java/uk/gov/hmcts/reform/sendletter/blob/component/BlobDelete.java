@@ -58,7 +58,7 @@ public class BlobDelete {
             cleanUp(file);
 
         } catch (IOException e) {
-            LOG.error("Error occured while performing backup", e);
+            LOG.error("Error occurred while performing backup", e);
         }
         return true;
     }

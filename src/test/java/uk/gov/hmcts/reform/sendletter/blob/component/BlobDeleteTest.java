@@ -70,9 +70,7 @@ class BlobDeleteTest {
         var sasTokenGeneratorService = new SasTokenGeneratorService(blobServiceClient,
                 accessTokenProperties);
         blobDelete = new BlobDelete(blobManager, sasTokenGeneratorService, mapper);
-
-         sasToken = sasTokenGeneratorService.generateSasToken(TEST_SERVICE_NAME);
-
+        sasToken = sasTokenGeneratorService.generateSasToken(TEST_SERVICE_NAME);
         sourceBlobClient = new BlobClientBuilder()
                 .endpoint(blobManager.getAccountUrl())
                 .sasToken(sasToken)
