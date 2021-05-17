@@ -42,8 +42,7 @@ public class BlobStitch {
         if (printResponse != null && printResponse.printJob != null && printResponse.printJob.documents != null
             && printResponse.printUploadInfo != null && printResponse.printUploadInfo.uploadToContainer != null) {
 
-            var containerObj = printResponse.printUploadInfo.uploadToContainer;
-            var containerName = containerObj.substring(containerObj.lastIndexOf("/") + 1);
+            var containerName = printResponse.printJob.containerName;
             var serviceName = printResponse.printJob.service;
             LOG.info("getPdfInfo serviceName {}, containerName {}", serviceName, containerName);
 
@@ -56,7 +55,7 @@ public class BlobStitch {
             }
 
             //create final pdfname
-            var finalPdfName = generatePdfName("type", serviceName,
+            var finalPdfName = generatePdfName(printResponse.printJob.type, serviceName,
                     printResponse.printJob.id);
 
             //pdf file with local file location
