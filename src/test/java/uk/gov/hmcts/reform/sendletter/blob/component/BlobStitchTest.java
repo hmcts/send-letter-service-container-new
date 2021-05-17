@@ -12,6 +12,8 @@ import com.google.common.io.Resources;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sendletter.config.AccessTokenProperties;
@@ -115,7 +117,7 @@ class BlobStitchTest {
         PrintResponse mockResponse = mock(PrintResponse.class);
         lenient().when(mapper.readValue(json, PrintResponse.class)).thenReturn(mockResponse);
 
-        DeleteBlob deleteBlob = blobStitch.stitchBlobs(response);
+        var deleteBlob = blobStitch.stitchBlobs(response);
         assertThat(deleteBlob.getBlobName().size()).isEqualTo(3);
     }
 
@@ -126,13 +128,14 @@ class BlobStitchTest {
         PrintResponse mockResponse = mock(PrintResponse.class);
         lenient().when(mapper.readValue(json, PrintResponse.class)).thenReturn(mockResponse);
         response = null;
-        DeleteBlob deleteBlob = blobStitch.stitchBlobs(response);
+        var deleteBlob = blobStitch.stitchBlobs(response);
         assertNull(deleteBlob.getBlobName());
     }
 
-    @Test
-    void should_not_return_stitch_blob_together_when_printjob_is_null() throws IOException {
-        json = Resources.toString(getResource("print_job_is_null.json"), UTF_8);
+    @ParameterizedTest
+    @MethodSource("stringArrayProvider")
+    void should_not_return_stitch_blob_together(String testJson) throws IOException {
+        json = Resources.toString(getResource(testJson), UTF_8);
         var objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         response = objectMapper.readValue(json, PrintResponse.class);
@@ -146,54 +149,12 @@ class BlobStitchTest {
         assertNull(deleteBlob.getBlobName());
     }
 
-    @Test
-    void should_not_return_stitch_blob_together_when_documents_is_null() throws IOException {
-        json = Resources.toString(getResource("print_job_response_document_is_null.json"), UTF_8);
-        var objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
-        response = objectMapper.readValue(json, PrintResponse.class);
-
-        mapper = spy(mapper);
-        mapper.registerModule(new JavaTimeModule());
-        PrintResponse mockResponse = mock(PrintResponse.class);
-        lenient().when(mapper.readValue(json, PrintResponse.class)).thenReturn(mockResponse);
-
-        DeleteBlob deleteBlob = blobStitch.stitchBlobs(response);
-        assertNull(deleteBlob.getBlobName());
+    static String[] stringArrayProvider() {
+        return new String[] {"print_job_response_document_is_null.json",
+            "print_job_upload_info_is_null.json",
+            "print_job_upload_to_container_is_null.json",
+            "print_job_is_null.json"};
     }
-
-    @Test
-    void should_not_return_stitch_blob_together_when_upload_info_is_null() throws IOException {
-        json = Resources.toString(getResource("print_job_upload_info_is_null.json"), UTF_8);
-        var objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
-        response = objectMapper.readValue(json, PrintResponse.class);
-
-        mapper = spy(mapper);
-        mapper.registerModule(new JavaTimeModule());
-        PrintResponse mockResponse = mock(PrintResponse.class);
-        lenient().when(mapper.readValue(json, PrintResponse.class)).thenReturn(mockResponse);
-
-        DeleteBlob deleteBlob = blobStitch.stitchBlobs(response);
-        assertNull(deleteBlob.getBlobName());
-    }
-
-    @Test
-    void should_not_return_stitch_blob_together_when_upload_container_is_null() throws IOException {
-        json = Resources.toString(getResource("print_job_upload_to_container_is_null.json"), UTF_8);
-        var objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
-        response = objectMapper.readValue(json, PrintResponse.class);
-
-        mapper = spy(mapper);
-        mapper.registerModule(new JavaTimeModule());
-        PrintResponse mockResponse = mock(PrintResponse.class);
-        lenient().when(mapper.readValue(json, PrintResponse.class)).thenReturn(mockResponse);
-
-        DeleteBlob deleteBlob = blobStitch.stitchBlobs(response);
-        assertNull(deleteBlob.getBlobName());
-    }
-
 
     private void createAccessTokenConfig() {
         AccessTokenProperties.TokenConfig tokenConfig = new AccessTokenProperties.TokenConfig();

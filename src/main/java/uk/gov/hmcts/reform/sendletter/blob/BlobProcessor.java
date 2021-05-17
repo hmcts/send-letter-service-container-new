@@ -7,7 +7,6 @@ import uk.gov.hmcts.reform.sendletter.blob.component.BlobBackup;
 import uk.gov.hmcts.reform.sendletter.blob.component.BlobDelete;
 import uk.gov.hmcts.reform.sendletter.blob.component.BlobReader;
 import uk.gov.hmcts.reform.sendletter.blob.component.BlobStitch;
-import uk.gov.hmcts.reform.sendletter.model.in.DeleteBlob;
 import uk.gov.hmcts.reform.sendletter.model.in.ManifestBlobInfo;
 
 import java.io.IOException;
@@ -36,7 +35,7 @@ public class BlobProcessor {
             var printResponse = blobBackup.backupBlobs(blobInfo.get());
             LOG.info("BlobProcessor:: backup blobs response {}", printResponse);
             LOG.info("BlobProcessor:: stitch blobs");
-            DeleteBlob deleteBlob = blobStitch.stitchBlobs(printResponse);
+            var deleteBlob = blobStitch.stitchBlobs(printResponse);
             LOG.info("BlobProcessor:: delete original blobs");
             blobDelete.deleteOriginalBlobs(deleteBlob);
         }
