@@ -44,7 +44,7 @@ public class BlobDelete {
             sourceBlobClient.downloadToFile(blobFile, true);
 
             var file =  new File(blobFile);
-            PrintResponse printResponse = mapper.readValue(file, PrintResponse.class);
+            var printResponse = mapper.readValue(file, PrintResponse.class);
 
             if (printResponse != null && printResponse.printJob != null && printResponse.printJob.documents != null) {
                 for (Document m : printResponse.printJob.documents) {
