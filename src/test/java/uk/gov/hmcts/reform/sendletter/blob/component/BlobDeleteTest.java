@@ -46,8 +46,10 @@ class BlobDeleteTest {
     @Mock
     private BlobClient client;
 
+    private BlobClient sourceBlobClient;
     private BlobDelete blobDelete;
     private ManifestBlobInfo blobInfo;
+    private String sasToken;
 
     @BeforeEach
     void setUp() throws IOException {
@@ -69,9 +71,9 @@ class BlobDeleteTest {
                 accessTokenProperties);
         blobDelete = new BlobDelete(blobManager, sasTokenGeneratorService, mapper);
 
-        var sasToken = sasTokenGeneratorService.generateSasToken(TEST_SERVICE_NAME);
+         sasToken = sasTokenGeneratorService.generateSasToken(TEST_SERVICE_NAME);
 
-        var sourceBlobClient = new BlobClientBuilder()
+        sourceBlobClient = new BlobClientBuilder()
                 .endpoint(blobManager.getAccountUrl())
                 .sasToken(sasToken)
                 .containerName(NEW_CONTAINER)
@@ -88,11 +90,25 @@ class BlobDeleteTest {
         myWriter.close();
         var printResponse = mock(PrintResponse.class);
         lenient().when(mapper.readValue(json, PrintResponse.class)).thenReturn(printResponse);
+        given(blobManager.getBlobClient(any(), any(), any())).willReturn(client);
     }
 
     @Test
-    void should_delete_original_blob_from_new_container() {
-        given(blobManager.getBlobClient(any(), any(), any())).willReturn(client);
+    void should_delete_original_blob_with_path_from_new_container() {
+        Boolean response = blobDelete.deleteOriginalBlobs(blobInfo);
+        assertThat(response.booleanValue()).isSameAs(true);
+    }
+
+    @Test
+    void should_delete_original_blob_without_path_from_new_container() {
+        String blobName = "print_job_response.json";
+        sourceBlobClient = new BlobClientBuilder()
+                .endpoint(blobManager.getAccountUrl())
+                .sasToken(sasToken)
+                .containerName(NEW_CONTAINER)
+                .blobName(blobName)
+                .buildClient();
+
         Boolean response = blobDelete.deleteOriginalBlobs(blobInfo);
         assertThat(response.booleanValue()).isSameAs(true);
     }
