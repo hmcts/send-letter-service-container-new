@@ -106,7 +106,7 @@ class BlobDeleteTest {
                 .containerName(NEW_CONTAINER)
                 .blobName(blobName)
                 .buildClient();
-
+        blobInfo = new ManifestBlobInfo(TEST_SERVICE_NAME, NEW_CONTAINER, blobName);
         Boolean response = blobDelete.deleteOriginalBlobs(blobInfo);
         assertThat(response.booleanValue()).isSameAs(true);
     }
