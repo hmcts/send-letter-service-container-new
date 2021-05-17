@@ -29,6 +29,7 @@ public class BlobStitch {
     private final BlobManager blobManager;
     private static final String SEPARATOR = "_";
     private static final String DEST_DIRECTORY = "/var/tmp/";
+    private static final String PROCESSED_CONTAINER = "processed";
 
     public BlobStitch(BlobManager blobManager, SasTokenGeneratorService sasTokenGeneratorService,
                       PdfCreator pdfCreator) {
@@ -73,7 +74,7 @@ public class BlobStitch {
             }
 
             // Create the container and return a container client object
-            var containerClient = blobManager.getContainerClient("processed");
+            var containerClient = blobManager.getContainerClient(PROCESSED_CONTAINER);
 
             // Get a reference to a blob
             var blobClient = containerClient.getBlobClient(finalPdfName);
