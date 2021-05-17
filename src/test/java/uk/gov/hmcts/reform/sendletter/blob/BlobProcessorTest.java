@@ -9,6 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sendletter.blob.component.BlobBackup;
+import uk.gov.hmcts.reform.sendletter.blob.component.BlobDelete;
 import uk.gov.hmcts.reform.sendletter.blob.component.BlobReader;
 import uk.gov.hmcts.reform.sendletter.blob.component.BlobStitch;
 import uk.gov.hmcts.reform.sendletter.model.in.ManifestBlobInfo;
@@ -34,6 +35,8 @@ class BlobProcessorTest {
     private BlobBackup blobBackup;
     @Mock
     private BlobStitch blobStitch;
+    @Mock
+    private BlobDelete blobDelete;
 
     private ManifestBlobInfo blobInfo;
 
@@ -41,7 +44,7 @@ class BlobProcessorTest {
     void setUp() throws IOException {
         blobInfo = new ManifestBlobInfo("sscs", "new-sscs",
                 "manifests-xyz.json");
-        processBlob = new BlobProcessor(blobReader, blobBackup, blobStitch);
+        processBlob = new BlobProcessor(blobReader, blobBackup, blobStitch, blobDelete);
         given(blobReader.retrieveManifestsToProcess()).willReturn(Optional.of(blobInfo));
 
         String json = Resources.toString(getResource("print_job_response.json"), UTF_8);
@@ -53,7 +56,7 @@ class BlobProcessorTest {
     }
 
     @Test
-    void should_process_blob_when_triggered() throws InterruptedException, IOException {
+    void should_process_blob_when_triggered() throws IOException {
         boolean processed = processBlob.read();
         assertThat(processed).isTrue();
         verify(blobReader).retrieveManifestsToProcess();
@@ -67,5 +70,6 @@ class BlobProcessorTest {
                 .isEqualTo("manifest-33dffc2f-94e0-4584-a973-cc56849ecc0b-sscs.json");
 
         verify(blobStitch).stitchBlobs(printResponse);
+        verify(blobDelete).deleteOriginalBlobs(blobInfo);
     }
 }

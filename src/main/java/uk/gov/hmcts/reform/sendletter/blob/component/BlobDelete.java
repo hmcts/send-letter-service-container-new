@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sendletter.blob.component;
 
-import com.azure.storage.blob.BlobClientBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,22 +15,20 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 @Component
-public class BlobBackup {
+public class BlobDelete {
 
-    private static final Logger LOG = LoggerFactory.getLogger(BlobBackup.class);
+    private static final Logger LOG = LoggerFactory.getLogger(BlobDelete.class);
     private final SasTokenGeneratorService sasTokenGeneratorService;
     private final BlobManager blobManager;
     private final ObjectMapper mapper;
-    private static final String BACKUP_CONTAINER = "backup";
 
-    public BlobBackup(BlobManager blobManager, SasTokenGeneratorService sasTokenGeneratorService, ObjectMapper mapper) {
+    public BlobDelete(BlobManager blobManager, SasTokenGeneratorService sasTokenGeneratorService, ObjectMapper mapper) {
         this.blobManager =  blobManager;
         this.sasTokenGeneratorService  = sasTokenGeneratorService;
         this.mapper = mapper;
     }
 
-    public PrintResponse backupBlobs(ManifestBlobInfo blobInfo) {
-        PrintResponse printResponse = null;
+    public Boolean deleteOriginalBlobs(ManifestBlobInfo blobInfo) {
         var destDirectory = "/var/tmp/";
         try {
             var serviceName = blobInfo.getServiceName();
@@ -47,22 +44,23 @@ public class BlobBackup {
             sourceBlobClient.downloadToFile(blobFile, true);
 
             var file =  new File(blobFile);
-            printResponse = mapper.readValue(file, PrintResponse.class);
+            PrintResponse printResponse = mapper.readValue(file, PrintResponse.class);
 
             if (printResponse != null && printResponse.printJob != null && printResponse.printJob.documents != null) {
                 for (Document m : printResponse.printJob.documents) {
                     var pdfFile = m.uploadToPath;
-                    LOG.info("Document FileName {}, NoOfCopies {}, uploadToPath {}", m.fileName, m.copies, pdfFile);
-                    doBackup(pdfFile, sasToken, containerName);
+                    LOG.info("BlobDelete:: Document FileName {}, NoOfCopies {}, uploadToPath {}", m.fileName, m.copies,
+                            pdfFile);
+                    doDelete(pdfFile, sasToken, containerName);
                 }
-                doBackup(fileName, sasToken, containerName);
+                doDelete(fileName, sasToken, containerName);
             }
             cleanUp(file);
 
         } catch (IOException e) {
             LOG.error("Error occured while performing backup", e);
         }
-        return printResponse;
+        return true;
     }
 
     private void cleanUp(File file) throws IOException {
@@ -70,21 +68,12 @@ public class BlobBackup {
         Files.delete(path);
     }
 
-    private void doBackup(String pdfFile, String sasToken, String sourceContainerName) {
-        LOG.info("About to backup original blob in backup container");
-
-        var destContainerClient = blobManager.getContainerClient(BACKUP_CONTAINER);
-        var sourceBlobClient = new BlobClientBuilder()
-                .endpoint(blobManager.getAccountUrl())
-                .sasToken(sasToken)
-                .containerName(sourceContainerName)
-                .blobName(pdfFile)
-                .buildClient();
-
-        var destBlobClient = destContainerClient.getBlobClient(pdfFile);
+    private void doDelete(String pdfFile, String sasToken, String sourceContainerName) {
+        LOG.info("About to delete original blob from {} container", sourceContainerName);
+        var  sourceBlobClient = blobManager.getBlobClient(sourceContainerName, sasToken, pdfFile);
         var blob = sourceBlobClient.getBlobUrl();
-        destBlobClient.copyFromUrl(blob + "?" + sasToken);
-        LOG.info("Blob {} backup completed.", blob);
+        sourceBlobClient.delete();
+        LOG.info("Blob {} delete successfully.", blob);
     }
 
     //This is only for download locally in /var/tmp.
