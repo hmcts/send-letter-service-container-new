@@ -12,10 +12,12 @@ import uk.gov.hmcts.reform.sendletter.blob.component.BlobBackup;
 import uk.gov.hmcts.reform.sendletter.blob.component.BlobDelete;
 import uk.gov.hmcts.reform.sendletter.blob.component.BlobReader;
 import uk.gov.hmcts.reform.sendletter.blob.component.BlobStitch;
+import uk.gov.hmcts.reform.sendletter.model.in.DeleteBlob;
 import uk.gov.hmcts.reform.sendletter.model.in.ManifestBlobInfo;
 import uk.gov.hmcts.reform.sendletter.model.in.PrintResponse;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 import static com.google.common.base.Charsets.UTF_8;
@@ -53,6 +55,15 @@ class BlobProcessorTest {
         PrintResponse printResponse = objectMapper.readValue(json, PrintResponse.class);
 
         given(blobBackup.backupBlobs(blobInfo)).willReturn(printResponse);
+
+        DeleteBlob deleteBlob = new DeleteBlob();
+        deleteBlob.setBlobName(List.of("33dffc2f-94e0-4584-a973-cc56849ecc0b-sscs-SSC001-mypdf.pdf",
+                "33dffc2f-94e0-4584-a973-cc56849ecc0b-sscs-SSC001-1.pdf",
+                "manifest-/manifest-33dffc2f-94e0-4584-a973-cc56849ecc0b-sscs.json"));
+        deleteBlob.setContainerName("new-sscs");
+        deleteBlob.setServiceName("sscs");
+        given(blobStitch.stitchBlobs(printResponse)).willReturn(deleteBlob);
+
     }
 
     @Test
@@ -63,13 +74,8 @@ class BlobProcessorTest {
 
         PrintResponse printResponse = blobBackup.backupBlobs(blobInfo);
         assertNotNull(printResponse);
-        assertNotNull(printResponse.printJob);
-        assertNotNull(printResponse.printUploadInfo);
-        assertNotNull(printResponse.printUploadInfo.uploadToContainer);
-        assertThat(printResponse.printUploadInfo.manifestPath)
-                .isEqualTo("manifest-33dffc2f-94e0-4584-a973-cc56849ecc0b-sscs.json");
 
-        verify(blobStitch).stitchBlobs(printResponse);
-        verify(blobDelete).deleteOriginalBlobs(blobInfo);
+        DeleteBlob deleteBlob = blobStitch.stitchBlobs(printResponse);
+        verify(blobDelete).deleteOriginalBlobs(deleteBlob);
     }
 }

@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sendletter.blob.component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.sendletter.model.in.DeleteBlob;
 import uk.gov.hmcts.reform.sendletter.model.in.Doc;
 import uk.gov.hmcts.reform.sendletter.model.in.Document;
 import uk.gov.hmcts.reform.sendletter.model.in.PrintResponse;
@@ -36,9 +37,9 @@ public class BlobStitch {
         this.pdfCreator = pdfCreator;
     }
 
-    public void stitchBlobs(PrintResponse printResponse) throws IOException {
+    public DeleteBlob stitchBlobs(PrintResponse printResponse) throws IOException {
         List<Doc> docs = new ArrayList<>();
-
+        DeleteBlob deleteBlob = new DeleteBlob();
         if (printResponse != null && printResponse.printJob != null && printResponse.printJob.documents != null
             && printResponse.printUploadInfo != null && printResponse.printUploadInfo.uploadToContainer != null) {
 
@@ -50,10 +51,15 @@ public class BlobStitch {
             var sasToken = sasTokenGeneratorService.generateSasToken(serviceName);
 
             //convert pdf to list of byte[]
+            List<String> blobs = new ArrayList<>();
             for (var document : printResponse.printJob.documents) {
+                blobs.add(document.uploadToPath);
                 docs.add(getPdfDocuments(containerName, sasToken, document));
             }
-
+            blobs.add(printResponse.printUploadInfo.manifestPath);
+            deleteBlob.setServiceName(serviceName);
+            deleteBlob.setContainerName(containerName);
+            deleteBlob.setBlobName(blobs);
             //create final pdfname
             var finalPdfName = generatePdfName(printResponse.printJob.type, serviceName,
                     printResponse.printJob.id);
@@ -81,6 +87,7 @@ public class BlobStitch {
             // delete pdf from local
             cleanUp(finalPdfPath);
         }
+        return deleteBlob;
     }
 
     private Doc getPdfDocuments(String containerName, String sasToken, Document document) throws IOException {

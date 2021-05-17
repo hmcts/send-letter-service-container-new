@@ -15,6 +15,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sendletter.config.AccessTokenProperties;
+import uk.gov.hmcts.reform.sendletter.model.in.DeleteBlob;
 import uk.gov.hmcts.reform.sendletter.model.in.PrintResponse;
 import uk.gov.hmcts.reform.sendletter.services.SasTokenGeneratorService;
 import uk.gov.hmcts.reform.sendletter.services.pdf.PdfCreator;
@@ -114,8 +115,8 @@ class BlobStitchTest {
         PrintResponse mockResponse = mock(PrintResponse.class);
         lenient().when(mapper.readValue(json, PrintResponse.class)).thenReturn(mockResponse);
 
-        blobStitch.stitchBlobs(response);
-        assertThat(response.printJob.documents.size()).isEqualTo(2);
+        DeleteBlob deleteBlob = blobStitch.stitchBlobs(response);
+        assertThat(deleteBlob.getBlobName().size()).isEqualTo(3);
     }
 
     @Test
@@ -125,8 +126,8 @@ class BlobStitchTest {
         PrintResponse mockResponse = mock(PrintResponse.class);
         lenient().when(mapper.readValue(json, PrintResponse.class)).thenReturn(mockResponse);
         response = null;
-        blobStitch.stitchBlobs(response);
-        assertNull(response);
+        DeleteBlob deleteBlob = blobStitch.stitchBlobs(response);
+        assertNull(deleteBlob.getBlobName());
     }
 
     @Test
@@ -141,8 +142,8 @@ class BlobStitchTest {
         PrintResponse mockResponse = mock(PrintResponse.class);
         lenient().when(mapper.readValue(json, PrintResponse.class)).thenReturn(mockResponse);
 
-        blobStitch.stitchBlobs(response);
-        assertNull(response.printJob);
+        DeleteBlob deleteBlob = blobStitch.stitchBlobs(response);
+        assertNull(deleteBlob.getBlobName());
     }
 
     @Test
@@ -157,8 +158,8 @@ class BlobStitchTest {
         PrintResponse mockResponse = mock(PrintResponse.class);
         lenient().when(mapper.readValue(json, PrintResponse.class)).thenReturn(mockResponse);
 
-        blobStitch.stitchBlobs(response);
-        assertNull(response.printJob.documents);
+        DeleteBlob deleteBlob = blobStitch.stitchBlobs(response);
+        assertNull(deleteBlob.getBlobName());
     }
 
     @Test
@@ -173,8 +174,8 @@ class BlobStitchTest {
         PrintResponse mockResponse = mock(PrintResponse.class);
         lenient().when(mapper.readValue(json, PrintResponse.class)).thenReturn(mockResponse);
 
-        blobStitch.stitchBlobs(response);
-        assertNull(response.printUploadInfo);
+        DeleteBlob deleteBlob = blobStitch.stitchBlobs(response);
+        assertNull(deleteBlob.getBlobName());
     }
 
     @Test
@@ -189,8 +190,8 @@ class BlobStitchTest {
         PrintResponse mockResponse = mock(PrintResponse.class);
         lenient().when(mapper.readValue(json, PrintResponse.class)).thenReturn(mockResponse);
 
-        blobStitch.stitchBlobs(response);
-        assertNull(response.printUploadInfo.uploadToContainer);
+        DeleteBlob deleteBlob = blobStitch.stitchBlobs(response);
+        assertNull(deleteBlob.getBlobName());
     }
 
 
