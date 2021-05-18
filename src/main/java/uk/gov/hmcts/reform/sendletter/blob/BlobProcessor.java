@@ -37,7 +37,7 @@ public class BlobProcessor {
             LOG.info("BlobProcessor:: stitch blobs");
             var deleteBlob = blobStitch.stitchBlobs(printResponse);
             LOG.info("BlobProcessor:: delete original blobs");
-            blobDelete.deleteOriginalBlobs(deleteBlob);
+            //blobDelete.deleteOriginalBlobs(deleteBlob);
         }
 
         return true;
