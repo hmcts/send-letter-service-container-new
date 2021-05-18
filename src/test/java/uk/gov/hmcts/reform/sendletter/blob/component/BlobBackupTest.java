@@ -60,7 +60,7 @@ class BlobBackupTest {
     private String sasToken;
 
     @BeforeEach
-    void setUp() throws IOException {
+    void setUp() {
         mapper = new ObjectMapper();
         given(blobManager.getAccountUrl()).willReturn("http://test.account");
 
@@ -121,7 +121,7 @@ class BlobBackupTest {
     }
 
     @Test
-    void should_copy_blob_without_from_new_container_to_backup_container() throws IOException {
+    void should_copy_blob_without_path_from_new_container_to_backup_container() throws IOException {
         String blobName = "print_job_response.json";
         sourceBlobClient = new BlobClientBuilder()
                 .endpoint(blobManager.getAccountUrl())

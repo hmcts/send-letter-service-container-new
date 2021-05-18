@@ -1,39 +1,35 @@
 package uk.gov.hmcts.reform.sendletter.model.in;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
+import javax.validation.Valid;
 
 public class PrintJob {
     public final UUID id;
 
     @JsonProperty("created_at")
-    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
-    public final LocalDateTime createdAt;
+    public final ZonedDateTime createdAt;
 
     @JsonProperty("printed_at")
-    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
-    public final LocalDateTime printedAt;
+    public final ZonedDateTime printedAt;
 
     @JsonProperty("sent_to_print_at")
-    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
-    public final LocalDateTime sentToPrintAt;
+    public final ZonedDateTime sentToPrintAt;
 
     public final String service;
+
+    public final String type;
+
+    @JsonProperty("container_name")
+    public final String containerName;
 
     @JsonProperty("status")
     public final PrintStatus printStatus;
 
-    public final List<Document> documents;
+    public final List<@Valid Document> documents;
 
     @JsonProperty("case_id")
     public final String caseId;
@@ -51,6 +47,8 @@ public class PrintJob {
         printedAt = null;
         sentToPrintAt = null;
         service = null;
+        type = null;
+        containerName = null;
         printStatus = null;
         documents = null;
         caseId = null;
@@ -60,12 +58,13 @@ public class PrintJob {
 
     @SuppressWarnings("squid:S00107")
     public PrintJob(UUID id,
-                    LocalDateTime createdAt,
-                    LocalDateTime printedAt,
-                    LocalDateTime sentToPrintAt,
+                    ZonedDateTime createdAt,
+                    ZonedDateTime printedAt,
+                    ZonedDateTime sentToPrintAt,
                     String service,
-                    PrintStatus printStatus,
-                    List<Document> documents,
+                    String type,
+                    String containerName, PrintStatus printStatus,
+                    List<@Valid Document> documents,
                     String caseId,
                     String caseRef,
                     String letterType) {
@@ -74,6 +73,8 @@ public class PrintJob {
         this.printedAt = printedAt;
         this.sentToPrintAt = sentToPrintAt;
         this.service = service;
+        this.type = type;
+        this.containerName = containerName;
         this.printStatus = printStatus;
         this.documents = documents;
         this.caseId = caseId;

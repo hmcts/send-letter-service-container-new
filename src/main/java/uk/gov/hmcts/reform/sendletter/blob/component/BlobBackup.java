@@ -39,12 +39,12 @@ public class BlobBackup {
             var fileName = blobInfo.getBlobName();
 
             LOG.info("getPdfInfo serviceName {}, containerName {}, blobName {}", serviceName, containerName, fileName);
-            var sasToken = sasTokenGeneratorService.generateSasToken(blobInfo.getServiceName());
+            var sasToken = sasTokenGeneratorService.generateSasToken(serviceName);
             LOG.info("sasToken code: {}", sasToken);
             var  sourceBlobClient = blobManager.getBlobClient(containerName, sasToken, fileName);
 
             var blobFile = destDirectory + removeSlashFromBlobName(fileName);
-            sourceBlobClient.downloadToFile(blobFile);
+            sourceBlobClient.downloadToFile(blobFile, true);
 
             var file =  new File(blobFile);
             printResponse = mapper.readValue(file, PrintResponse.class);

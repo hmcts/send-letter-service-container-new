@@ -192,6 +192,7 @@ dependencyManagement {
 repositories {
   mavenLocal()
   mavenCentral()
+  maven { url 'https://jitpack.io' }
   jcenter()
 }
 
@@ -214,6 +215,9 @@ ext.libraries = [
 ]
 
 dependencies {
+  def withoutJunit4 = {
+    exclude group: 'junit', module: 'junit'
+  }
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
   implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '11.0'
@@ -225,6 +229,10 @@ dependencies {
   implementation group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
   implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger
 
+  implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: '2.0.23'
+
+  implementation group: 'com.github.hmcts.rpe-pdf-service', name: 'pdf-generator', version:'1.0.2'
+
   compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.14.1'
   compile group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.14.1'
 
@@ -233,6 +241,8 @@ dependencies {
     exclude group: 'junit', module: 'junit'
     exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
   }
+
+  testImplementation group: 'org.apache.pdfbox', name: 'preflight', version: '2.0.23', withoutJunit4
 
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath
