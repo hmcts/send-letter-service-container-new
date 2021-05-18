@@ -82,7 +82,7 @@ public class BlobStitch {
             LOG.info("Uploading to Blob storage as blob: {}", blobClient.getBlobUrl());
 
             // Upload the blob
-            blobClient.uploadFromFile(finalPdfPath);
+            blobClient.uploadFromFile(finalPdfPath, true);
             LOG.info("Uploaded blob {} to Blob storage completed.", blobClient.getBlobUrl());
 
             // delete pdf from local
