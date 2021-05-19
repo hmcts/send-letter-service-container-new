@@ -60,7 +60,7 @@ public class BlobProcessor {
                 LOG.info("Lease released");
 
             } catch (BlobStorageException bse) {
-                LOG.info("There is already a lease present for blob {}", blobClient.getBlobName());
+                LOG.info("There is already a lease present for blob {}", blobClient.getBlobName(), bse);
             }
         }
 
