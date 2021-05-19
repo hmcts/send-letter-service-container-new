@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sendletter.blob;
 
-import com.azure.storage.blob.models.BlobProperties;
 import com.azure.storage.blob.models.BlobStorageException;
 import com.azure.storage.blob.specialized.BlobLeaseClient;
 import org.slf4j.Logger;
@@ -56,7 +55,7 @@ public class BlobProcessor {
                 var deleteBlob = blobStitch.stitchBlobs(printResponse);
                 LOG.info("BlobProcessor:: delete original blobs");
                 //blobDelete.deleteOriginalBlobs(deleteBlob);
-                BlobProperties properties = blobClient.getProperties();
+                var properties = blobClient.getProperties();
                 LOG.info("Lease information state: {}, status: {}, duration: {} ", properties.getLeaseState(),
                         properties.getLeaseStatus(), properties.getLeaseDuration());
                 leaseClient.releaseLease();
