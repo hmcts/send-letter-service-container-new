@@ -28,11 +28,10 @@ import java.util.Optional;
 
 import static com.google.common.base.Charsets.UTF_8;
 import static com.google.common.io.Resources.getResource;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class BlobProcessorTest {
@@ -93,8 +92,10 @@ class BlobProcessorTest {
     @Test
     void should_process_blob_when_triggered() throws IOException {
         boolean processed = processBlob.read();
-        assertThat(processed).isTrue();
-        verify(blobReader).retrieveManifestsToProcess();
+        assertTrue(processed);
+
+        var manifestBlobInfo = blobReader.retrieveManifestsToProcess();
+        assertTrue(manifestBlobInfo.isPresent());
 
         PrintResponse printResponse = blobBackup.backupBlobs(blobInfo);
         assertNotNull(printResponse);
