@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sendletter.blob;
 
 import com.azure.storage.blob.models.BlobStorageException;
-import com.azure.storage.blob.specialized.BlobLeaseClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -26,7 +25,6 @@ public class BlobProcessor {
     private final BlobStitch blobStitch;
     private final BlobDelete blobDelete;
     private final LeaseClientProvider leaseClientProvider;
-    private BlobLeaseClient leaseClient;
 
     public BlobProcessor(BlobReader blobReader, BlobBackup blobBackup, BlobStitch blobStitch,
                          BlobDelete blobDelete, BlobManager blobManager,
@@ -46,7 +44,7 @@ public class BlobProcessor {
 
             var containerClient  = blobManager.getContainerClient(blobInfo.get().getContainerName());
             var blobClient = containerClient.getBlobClient(blobInfo.get().getBlobName());
-            leaseClient = leaseClientProvider.get(blobClient);
+            var leaseClient = leaseClientProvider.get(blobClient);
             try {
                 leaseClient.acquireLease(20);
                 var printResponse = blobBackup.backupBlobs(blobInfo.get());
