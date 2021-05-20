@@ -70,9 +70,6 @@ public class BlobProcessor {
                         new BlobRequestConditions().setLeaseId(leaseId),
                         null,
                         Context.NONE);
-                leaseClient.releaseLease();
-                LOG.info("Lease released");
-
             } catch (BlobStorageException bse) {
                 LOG.error("There is already a lease present for blob {}", blobClient.getBlobName(), bse);
             }
