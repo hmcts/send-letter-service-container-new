@@ -1,6 +1,9 @@
 package uk.gov.hmcts.reform.sendletter.blob;
 
+import com.azure.core.util.Context;
+import com.azure.storage.blob.models.BlobRequestConditions;
 import com.azure.storage.blob.models.BlobStorageException;
+import com.azure.storage.blob.models.DeleteSnapshotsOptionType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -50,9 +53,9 @@ public class BlobProcessor {
             var blobClient = containerClient.getBlobClient(blobInfo.get().getBlobName());
             var leaseClient = leaseClientProvider.get(blobClient);
             try {
-                leaseClient.acquireLease(leaseTime);
-                LOG.info("BlobProcessor::blob {} has been leased for {} seconds.",
-                        blobInfo.get().getBlobName(), leaseTime);
+                var leaseId = leaseClient.acquireLease(leaseTime);
+                LOG.info("BlobProcessor::blob {} has been leased for {} seconds with leaseId {}",
+                        blobInfo.get().getBlobName(), leaseTime, leaseId);
                 var printResponse = blobBackup.backupBlobs(blobInfo.get());
                 LOG.info("BlobProcessor:: backup blobs response {}", printResponse);
                 LOG.info("BlobProcessor:: stitch blobs");
@@ -62,7 +65,11 @@ public class BlobProcessor {
                 var properties = blobClient.getProperties();
                 LOG.info("Lease information state: {}, status: {}, duration: {} ", properties.getLeaseState(),
                         properties.getLeaseStatus(), properties.getLeaseDuration());
-                blobClient.delete();
+                blobClient.deleteWithResponse(
+                        DeleteSnapshotsOptionType.INCLUDE,
+                        new BlobRequestConditions().setLeaseId(leaseId),
+                        null,
+                        Context.NONE);
                 leaseClient.releaseLease();
                 LOG.info("Lease released");
 

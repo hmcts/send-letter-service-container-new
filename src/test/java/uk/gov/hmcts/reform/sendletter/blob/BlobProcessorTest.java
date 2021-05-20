@@ -103,6 +103,6 @@ class BlobProcessorTest {
         var deleteBlob = blobStitch.stitchBlobs(printResponse);
         verify(blobDelete).deleteOriginalBlobs(deleteBlob);
 
-        verify(blobClient).delete();
+        verify(blobClient).deleteWithResponse(any(), any(), any(), any());
     }
 }
