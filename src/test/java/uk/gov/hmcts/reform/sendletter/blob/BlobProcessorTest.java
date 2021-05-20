@@ -1,5 +1,9 @@
 package uk.gov.hmcts.reform.sendletter.blob;
 
+import com.azure.storage.blob.BlobClient;
+import com.azure.storage.blob.BlobContainerClient;
+import com.azure.storage.blob.models.BlobProperties;
+import com.azure.storage.blob.specialized.BlobLeaseClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.common.io.Resources;
@@ -10,8 +14,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sendletter.blob.component.BlobBackup;
 import uk.gov.hmcts.reform.sendletter.blob.component.BlobDelete;
+import uk.gov.hmcts.reform.sendletter.blob.component.BlobManager;
 import uk.gov.hmcts.reform.sendletter.blob.component.BlobReader;
 import uk.gov.hmcts.reform.sendletter.blob.component.BlobStitch;
+import uk.gov.hmcts.reform.sendletter.blob.storage.LeaseClientProvider;
 import uk.gov.hmcts.reform.sendletter.model.in.DeleteBlob;
 import uk.gov.hmcts.reform.sendletter.model.in.ManifestBlobInfo;
 import uk.gov.hmcts.reform.sendletter.model.in.PrintResponse;
@@ -22,15 +28,16 @@ import java.util.Optional;
 
 import static com.google.common.base.Charsets.UTF_8;
 import static com.google.common.io.Resources.getResource;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class BlobProcessorTest {
     private BlobProcessor processBlob;
-
+    @Mock
+    private BlobManager blobManager;
     @Mock
     private BlobReader blobReader;
     @Mock
@@ -41,13 +48,29 @@ class BlobProcessorTest {
     private BlobDelete blobDelete;
 
     private ManifestBlobInfo blobInfo;
+    @Mock
+    private BlobClient blobClient;
+    @Mock
+    private BlobContainerClient blobContainerClient;
+    @Mock
+    private LeaseClientProvider leaseClientProvider;
+    @Mock
+    private BlobLeaseClient blobLeaseClient;
+    @Mock
+    private BlobProperties properties;
 
     @BeforeEach
     void setUp() throws IOException {
         blobInfo = new ManifestBlobInfo("sscs", "new-sscs",
                 "manifests-xyz.json");
-        processBlob = new BlobProcessor(blobReader, blobBackup, blobStitch, blobDelete);
+        processBlob = new BlobProcessor(blobReader, blobBackup, blobStitch, blobDelete,
+                blobManager, leaseClientProvider, 10);
         given(blobReader.retrieveManifestsToProcess()).willReturn(Optional.of(blobInfo));
+
+        given(blobManager.getContainerClient(any())).willReturn(blobContainerClient);
+        given(blobContainerClient.getBlobClient(any())).willReturn(blobClient);
+        given(leaseClientProvider.get(blobClient)).willReturn(blobLeaseClient);
+        given(blobClient.getProperties()).willReturn(properties);
 
         String json = Resources.toString(getResource("print_job_response.json"), UTF_8);
         ObjectMapper objectMapper = new ObjectMapper();
@@ -69,8 +92,10 @@ class BlobProcessorTest {
     @Test
     void should_process_blob_when_triggered() throws IOException {
         boolean processed = processBlob.read();
-        assertThat(processed).isTrue();
-        verify(blobReader).retrieveManifestsToProcess();
+        assertTrue(processed);
+
+        var manifestBlobInfo = blobReader.retrieveManifestsToProcess();
+        assertTrue(manifestBlobInfo.isPresent());
 
         PrintResponse printResponse = blobBackup.backupBlobs(blobInfo);
         assertNotNull(printResponse);
