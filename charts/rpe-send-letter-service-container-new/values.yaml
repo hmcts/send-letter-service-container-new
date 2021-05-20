@@ -41,3 +41,7 @@ function:
       blobContainerName: "new-sscs"
       accountName: "rpesendletter{{ .Values.global.environment }}"
       blobPrefix: manifest-
+    - type: azure-blob
+      blobContainerName: "new-bulkprint"
+      accountName: "rpesendletter{{ .Values.global.environment }}"
+      blobPrefix: manifest-
