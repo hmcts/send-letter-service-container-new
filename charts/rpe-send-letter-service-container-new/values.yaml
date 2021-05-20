@@ -6,8 +6,8 @@ function:
   keyVaults:
     "rpe-send-letter":
       secrets:
-        - name: storage-account-connection-string
-          alias: STORAGE_ACCOUNT_CONNECTION_STRING
+          - name: storage-account-connection-string
+            alias: STORAGE_ACCOUNT_CONNECTION_STRING
         - name: app-insights-instrumentation-key
           alias: azure.application-insights.instrumentation-key
   triggerAuth:
@@ -39,5 +39,9 @@ function:
       blobPrefix: manifest-
     - type: azure-blob
       blobContainerName: "new-sscs"
+      accountName: "rpesendletter{{ .Values.global.environment }}"
+      blobPrefix: manifest-
+    - type: azure-blob
+      blobContainerName: "new-bulkprint"
       accountName: "rpesendletter{{ .Values.global.environment }}"
       blobPrefix: manifest-
