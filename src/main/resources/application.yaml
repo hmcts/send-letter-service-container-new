@@ -8,6 +8,7 @@ spring:
 
 storage:
   connection: ${STORAGE_ACCOUNT_CONNECTION_STRING}
+  leaseTime: ${BLOB_LEASE_TIME:20} #In seconds
 
 accesstoken:
   serviceConfig:

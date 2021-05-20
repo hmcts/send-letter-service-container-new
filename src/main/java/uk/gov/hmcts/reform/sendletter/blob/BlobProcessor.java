@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sendletter.blob;
 import com.azure.storage.blob.models.BlobStorageException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sendletter.blob.component.BlobBackup;
 import uk.gov.hmcts.reform.sendletter.blob.component.BlobDelete;
@@ -25,20 +26,23 @@ public class BlobProcessor {
     private final BlobStitch blobStitch;
     private final BlobDelete blobDelete;
     private final LeaseClientProvider leaseClientProvider;
+    private Integer leaseTime;
 
     public BlobProcessor(BlobReader blobReader, BlobBackup blobBackup, BlobStitch blobStitch,
                          BlobDelete blobDelete, BlobManager blobManager,
-                         LeaseClientProvider leaseClientProvider) {
+                         LeaseClientProvider leaseClientProvider,
+                         @Value("${storage.leaseTime}") Integer leaseTime) {
         this.blobReader = blobReader;
         this.blobBackup = blobBackup;
         this.blobStitch = blobStitch;
         this.blobDelete = blobDelete;
         this.blobManager = blobManager;
         this.leaseClientProvider =  leaseClientProvider;
+        this.leaseTime = leaseTime;
     }
 
     public boolean read() throws IOException {
-        LOG.info("BlobProcessor:: read blobs ");
+        LOG.info("BlobProcessor:: read blobs {}",leaseTime);
         Optional<ManifestBlobInfo> blobInfo = blobReader.retrieveManifestsToProcess();
         if (blobInfo.isPresent()) {
 
@@ -46,7 +50,8 @@ public class BlobProcessor {
             var blobClient = containerClient.getBlobClient(blobInfo.get().getBlobName());
             var leaseClient = leaseClientProvider.get(blobClient);
             try {
-                leaseClient.acquireLease(20);
+                leaseClient.acquireLease(leaseTime);
+                LOG.info("BlobProcessor::blob {} has been leased for {} seconds.", blobInfo.get(), leaseTime);
                 var printResponse = blobBackup.backupBlobs(blobInfo.get());
                 LOG.info("BlobProcessor:: backup blobs response {}", printResponse);
                 LOG.info("BlobProcessor:: stitch blobs");

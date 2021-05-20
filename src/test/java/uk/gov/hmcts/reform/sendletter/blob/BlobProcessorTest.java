@@ -64,7 +64,7 @@ class BlobProcessorTest {
         blobInfo = new ManifestBlobInfo("sscs", "new-sscs",
                 "manifests-xyz.json");
         processBlob = new BlobProcessor(blobReader, blobBackup, blobStitch, blobDelete,
-                blobManager, leaseClientProvider);
+                blobManager, leaseClientProvider, 10);
         given(blobReader.retrieveManifestsToProcess()).willReturn(Optional.of(blobInfo));
 
         given(blobManager.getContainerClient(any())).willReturn(blobContainerClient);
