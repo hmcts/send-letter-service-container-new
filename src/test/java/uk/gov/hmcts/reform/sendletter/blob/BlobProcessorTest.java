@@ -32,6 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class BlobProcessorTest {
@@ -100,7 +101,7 @@ class BlobProcessorTest {
         PrintResponse printResponse = blobBackup.backupBlobs(blobInfo);
         assertNotNull(printResponse);
 
-        //DeleteBlob deleteBlob = blobStitch.stitchBlobs(printResponse);
-        //verify(blobDelete).deleteOriginalBlobs(deleteBlob);
+        var deleteBlob = blobStitch.stitchBlobs(printResponse);
+        verify(blobDelete).deleteOriginalBlobs(deleteBlob);
     }
 }
