@@ -51,13 +51,14 @@ public class BlobProcessor {
             var leaseClient = leaseClientProvider.get(blobClient);
             try {
                 leaseClient.acquireLease(leaseTime);
-                LOG.info("BlobProcessor::blob {} has been leased for {} seconds.", blobInfo.get(), leaseTime);
+                LOG.info("BlobProcessor::blob {} has been leased for {} seconds.",
+                        blobInfo.get().getBlobName(), leaseTime);
                 var printResponse = blobBackup.backupBlobs(blobInfo.get());
                 LOG.info("BlobProcessor:: backup blobs response {}", printResponse);
                 LOG.info("BlobProcessor:: stitch blobs");
                 var deleteBlob = blobStitch.stitchBlobs(printResponse);
                 LOG.info("BlobProcessor:: delete original blobs");
-                //blobDelete.deleteOriginalBlobs(deleteBlob);
+                blobDelete.deleteOriginalBlobs(deleteBlob);
                 var properties = blobClient.getProperties();
                 LOG.info("Lease information state: {}, status: {}, duration: {} ", properties.getLeaseState(),
                         properties.getLeaseStatus(), properties.getLeaseDuration());
