@@ -42,7 +42,7 @@ public class BlobProcessor {
     }
 
     public boolean read() throws IOException {
-        LOG.info("BlobProcessor:: read blobs {}",leaseTime);
+        LOG.info("BlobProcessor:: read blobs ");
         Optional<ManifestBlobInfo> blobInfo = blobReader.retrieveManifestsToProcess();
         if (blobInfo.isPresent()) {
 
