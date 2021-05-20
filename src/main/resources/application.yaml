@@ -32,6 +32,8 @@ accesstoken:
     - serviceName: sscs
       newContainerName: new-sscs
       validity: ${SAS_TOKEN_VALIDITY:300} #In seconds
-
+    - serviceName: send_letter_tests
+      newContainerName: new-bulkprint
+      validity: ${SAS_TOKEN_VALIDITY:300}
 
 
