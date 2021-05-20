@@ -82,8 +82,7 @@ class BlobProcessorTest {
 
         DeleteBlob deleteBlob = new DeleteBlob();
         deleteBlob.setBlobName(List.of("33dffc2f-94e0-4584-a973-cc56849ecc0b-sscs-SSC001-mypdf.pdf",
-                "33dffc2f-94e0-4584-a973-cc56849ecc0b-sscs-SSC001-1.pdf",
-                "manifest-/manifest-33dffc2f-94e0-4584-a973-cc56849ecc0b-sscs.json"));
+                "33dffc2f-94e0-4584-a973-cc56849ecc0b-sscs-SSC001-1.pdf"));
         deleteBlob.setContainerName("new-sscs");
         deleteBlob.setServiceName("sscs");
         given(blobStitch.stitchBlobs(printResponse)).willReturn(deleteBlob);
@@ -103,5 +102,7 @@ class BlobProcessorTest {
 
         var deleteBlob = blobStitch.stitchBlobs(printResponse);
         verify(blobDelete).deleteOriginalBlobs(deleteBlob);
+
+        verify(blobClient).delete();
     }
 }

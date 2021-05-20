@@ -57,7 +57,6 @@ public class BlobStitch {
                 blobs.add(document.uploadToPath);
                 docs.add(getPdfDocuments(containerName, sasToken, document));
             }
-            blobs.add(printResponse.printUploadInfo.manifestPath);
             deleteBlob.setServiceName(serviceName);
             deleteBlob.setContainerName(containerName);
             deleteBlob.setBlobName(blobs);

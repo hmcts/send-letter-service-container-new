@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sendletter.blob.component;
 
 import com.azure.storage.blob.BlobClientBuilder;
+import com.azure.storage.blob.models.BlobStorageException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,19 +73,22 @@ public class BlobBackup {
 
     private void doBackup(String pdfFile, String sasToken, String sourceContainerName) {
         LOG.info("About to backup original blob in backup container");
+        try {
+            var destContainerClient = blobManager.getContainerClient(BACKUP_CONTAINER);
+            var sourceBlobClient = new BlobClientBuilder()
+                    .endpoint(blobManager.getAccountUrl())
+                    .sasToken(sasToken)
+                    .containerName(sourceContainerName)
+                    .blobName(pdfFile)
+                    .buildClient();
 
-        var destContainerClient = blobManager.getContainerClient(BACKUP_CONTAINER);
-        var sourceBlobClient = new BlobClientBuilder()
-                .endpoint(blobManager.getAccountUrl())
-                .sasToken(sasToken)
-                .containerName(sourceContainerName)
-                .blobName(pdfFile)
-                .buildClient();
-
-        var destBlobClient = destContainerClient.getBlobClient(pdfFile);
-        var blob = sourceBlobClient.getBlobUrl();
-        destBlobClient.copyFromUrl(blob + "?" + sasToken);
-        LOG.info("Blob {} backup completed.", blob);
+            var destBlobClient = destContainerClient.getBlobClient(pdfFile);
+            var blob = sourceBlobClient.getBlobUrl();
+            destBlobClient.copyFromUrl(blob + "?" + sasToken);
+            LOG.info("Blob {} backup completed.", blob);
+        } catch (BlobStorageException bse) {
+            LOG.error("The specified blob does not exist.", bse);
+        }
     }
 
     //This is only for download locally in /var/tmp.

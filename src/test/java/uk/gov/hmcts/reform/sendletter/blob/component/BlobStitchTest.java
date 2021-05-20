@@ -118,7 +118,7 @@ class BlobStitchTest {
         lenient().when(mapper.readValue(json, PrintResponse.class)).thenReturn(mockResponse);
 
         var deleteBlob = blobStitch.stitchBlobs(response);
-        assertThat(deleteBlob.getBlobName().size()).isEqualTo(3);
+        assertThat(deleteBlob.getBlobName().size()).isEqualTo(2);
     }
 
     @Test

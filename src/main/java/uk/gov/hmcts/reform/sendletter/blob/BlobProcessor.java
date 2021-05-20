@@ -62,6 +62,7 @@ public class BlobProcessor {
                 var properties = blobClient.getProperties();
                 LOG.info("Lease information state: {}, status: {}, duration: {} ", properties.getLeaseState(),
                         properties.getLeaseStatus(), properties.getLeaseDuration());
+                blobClient.delete();
                 leaseClient.releaseLease();
                 LOG.info("Lease released");
 
