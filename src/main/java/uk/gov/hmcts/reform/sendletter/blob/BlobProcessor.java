@@ -68,6 +68,9 @@ public class BlobProcessor {
             } catch (BlobStorageException bse) {
                 LOG.error("There is already a lease present for blob {}", blobInfo.get().getBlobName(), bse);
             }
+        } else {
+            LOG.info("BlobProcessor:: no blobs for proccessing.");
+            return false;
         }
 
         return true;

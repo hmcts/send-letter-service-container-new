@@ -27,6 +27,7 @@ import java.util.Optional;
 
 import static com.google.common.base.Charsets.UTF_8;
 import static com.google.common.io.Resources.getResource;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -64,41 +65,44 @@ class BlobProcessorTest {
         processBlob = new BlobProcessor(blobReader, blobBackup, blobStitch, blobDelete,
                 blobManager, leaseClientProvider, 10);
         given(blobReader.retrieveManifestsToProcess()).willReturn(Optional.of(blobInfo));
+    }
 
+    @Test
+    void should_process_blob_when_triggered() throws IOException {
         given(blobManager.getContainerClient(any())).willReturn(blobContainerClient);
         given(blobContainerClient.getBlobClient(any())).willReturn(blobClient);
         given(leaseClientProvider.get(blobClient)).willReturn(blobLeaseClient);
-
-        String json = Resources.toString(getResource("print_job_response.json"), UTF_8);
-        ObjectMapper objectMapper = new ObjectMapper();
+        var json = Resources.toString(getResource("print_job_response.json"), UTF_8);
+        var objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         PrintResponse printResponse = objectMapper.readValue(json, PrintResponse.class);
 
         given(blobBackup.backupBlobs(blobInfo)).willReturn(printResponse);
 
-        DeleteBlob deleteBlob = new DeleteBlob();
+        var deleteBlob = new DeleteBlob();
         deleteBlob.setBlobName(List.of("33dffc2f-94e0-4584-a973-cc56849ecc0b-sscs-SSC001-mypdf.pdf",
                 "33dffc2f-94e0-4584-a973-cc56849ecc0b-sscs-SSC001-1.pdf"));
         deleteBlob.setContainerName("new-sscs");
         deleteBlob.setServiceName("sscs");
         given(blobStitch.stitchBlobs(printResponse)).willReturn(deleteBlob);
 
-    }
-
-    @Test
-    void should_process_blob_when_triggered() throws IOException {
         boolean processed = processBlob.read();
         assertTrue(processed);
 
         var manifestBlobInfo = blobReader.retrieveManifestsToProcess();
         assertTrue(manifestBlobInfo.isPresent());
 
-        PrintResponse printResponse = blobBackup.backupBlobs(blobInfo);
-        assertNotNull(printResponse);
+        var response = blobBackup.backupBlobs(blobInfo);
+        assertNotNull(response);
 
-        var deleteBlob = blobStitch.stitchBlobs(printResponse);
-        verify(blobDelete).deleteOriginalBlobs(deleteBlob);
+        verify(blobDelete).deleteOriginalBlobs(blobStitch.stitchBlobs(response));
 
         verify(blobClient).deleteWithResponse(any(), any(), any(), any());
+    }
+
+    @Test
+    void should_not_triggered_when_no_matching_blob_available() throws IOException {
+        given(blobReader.retrieveManifestsToProcess()).willReturn(Optional.empty());
+        assertFalse(processBlob.read());
     }
 }
