@@ -29,7 +29,7 @@ public class BlobProcessor {
     private final BlobStitch blobStitch;
     private final BlobDelete blobDelete;
     private final LeaseClientProvider leaseClientProvider;
-    private Integer leaseTime;
+    private final Integer leaseTime;
 
     public BlobProcessor(BlobReader blobReader, BlobBackup blobBackup, BlobStitch blobStitch,
                          BlobDelete blobDelete, BlobManager blobManager,
@@ -45,19 +45,18 @@ public class BlobProcessor {
     }
 
     public boolean read() throws IOException {
-        LOG.info("BlobProcessor:: read blobs ");
+        LOG.info("BlobProcessor:: proccessing blobs");
         Optional<ManifestBlobInfo> blobInfo = blobReader.retrieveManifestsToProcess();
         if (blobInfo.isPresent()) {
-            var containerClient  = blobManager.getContainerClient(blobInfo.get().getContainerName());
-            var blobClient = containerClient.getBlobClient(blobInfo.get().getBlobName());
-            var leaseClient = leaseClientProvider.get(blobClient);
             try {
+                var containerClient  = blobManager.getContainerClient(blobInfo.get().getContainerName());
+                var blobClient = containerClient.getBlobClient(blobInfo.get().getBlobName());
+                var leaseClient = leaseClientProvider.get(blobClient);
                 var leaseId = leaseClient.acquireLease(leaseTime);
                 LOG.info("BlobProcessor::blob {} has been leased for {} seconds with leaseId {}",
                         blobInfo.get().getBlobName(), leaseTime, leaseId);
                 var printResponse = blobBackup.backupBlobs(blobInfo.get());
                 LOG.info("BlobProcessor:: backup blobs response {}", printResponse);
-                LOG.info("BlobProcessor:: stitch blobs");
                 var deleteBlob = blobStitch.stitchBlobs(printResponse);
                 blobClient.deleteWithResponse(
                         DeleteSnapshotsOptionType.INCLUDE,
@@ -67,8 +66,11 @@ public class BlobProcessor {
                 blobDelete.deleteOriginalBlobs(deleteBlob);
                 LOG.info("BlobProcessor:: delete original blobs");
             } catch (BlobStorageException bse) {
-                LOG.error("There is already a lease present for blob {}", blobClient.getBlobName(), bse);
+                LOG.error("There is already a lease present for blob {}", blobInfo.get().getBlobName(), bse);
             }
+        } else {
+            LOG.info("BlobProcessor:: no blobs for proccessing.");
+            return false;
         }
 
         return true;
