@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sendletter.blob;
 
 import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobContainerClient;
-import com.azure.storage.blob.models.BlobProperties;
 import com.azure.storage.blob.specialized.BlobLeaseClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -57,8 +56,6 @@ class BlobProcessorTest {
     private LeaseClientProvider leaseClientProvider;
     @Mock
     private BlobLeaseClient blobLeaseClient;
-    @Mock
-    private BlobProperties properties;
 
     @BeforeEach
     void setUp() throws IOException {
@@ -71,7 +68,6 @@ class BlobProcessorTest {
         given(blobManager.getContainerClient(any())).willReturn(blobContainerClient);
         given(blobContainerClient.getBlobClient(any())).willReturn(blobClient);
         given(leaseClientProvider.get(blobClient)).willReturn(blobLeaseClient);
-        given(blobClient.getProperties()).willReturn(properties);
 
         String json = Resources.toString(getResource("print_job_response.json"), UTF_8);
         ObjectMapper objectMapper = new ObjectMapper();
