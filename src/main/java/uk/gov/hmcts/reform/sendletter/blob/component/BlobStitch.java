@@ -39,6 +39,7 @@ public class BlobStitch {
     }
 
     public DeleteBlob stitchBlobs(PrintResponse printResponse) throws IOException {
+        LOG.info("BlobProcessor:: stitchBlobs");
         List<Doc> docs = new ArrayList<>();
         var deleteBlob = new DeleteBlob();
         if (printResponse != null && printResponse.printJob != null && printResponse.printJob.documents != null
