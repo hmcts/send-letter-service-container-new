@@ -48,7 +48,6 @@ public class BlobProcessor {
         LOG.info("BlobProcessor:: read blobs ");
         Optional<ManifestBlobInfo> blobInfo = blobReader.retrieveManifestsToProcess();
         if (blobInfo.isPresent()) {
-
             var containerClient  = blobManager.getContainerClient(blobInfo.get().getContainerName());
             var blobClient = containerClient.getBlobClient(blobInfo.get().getBlobName());
             var leaseClient = leaseClientProvider.get(blobClient);
@@ -60,16 +59,13 @@ public class BlobProcessor {
                 LOG.info("BlobProcessor:: backup blobs response {}", printResponse);
                 LOG.info("BlobProcessor:: stitch blobs");
                 var deleteBlob = blobStitch.stitchBlobs(printResponse);
-                LOG.info("BlobProcessor:: delete original blobs");
-                blobDelete.deleteOriginalBlobs(deleteBlob);
-                var properties = blobClient.getProperties();
-                LOG.info("Lease information state: {}, status: {}, duration: {} ", properties.getLeaseState(),
-                        properties.getLeaseStatus(), properties.getLeaseDuration());
                 blobClient.deleteWithResponse(
                         DeleteSnapshotsOptionType.INCLUDE,
                         new BlobRequestConditions().setLeaseId(leaseId),
                         null,
                         Context.NONE);
+                blobDelete.deleteOriginalBlobs(deleteBlob);
+                LOG.info("BlobProcessor:: delete original blobs");
             } catch (BlobStorageException bse) {
                 LOG.error("There is already a lease present for blob {}", blobClient.getBlobName(), bse);
             }
