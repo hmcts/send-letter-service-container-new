@@ -10,6 +10,8 @@ function:
           alias: STORAGE_ACCOUNT_CONNECTION_STRING
         - name: app-insights-instrumentation-key
           alias: azure.application-insights.instrumentation-key
+  job:
+    activeDeadlineSeconds: 300          
   triggerAuth:
     enabled: true
   triggers:
