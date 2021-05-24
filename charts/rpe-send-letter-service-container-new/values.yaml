@@ -3,6 +3,7 @@ function:
   aadIdentityName: send-letter
   environment:
     SEND_LETTER_URL: "http://rpe-send-letter-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
+    VAR_TA: trigger1
   keyVaults:
     "rpe-send-letter":
       secrets:
