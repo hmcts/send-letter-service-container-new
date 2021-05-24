@@ -8,5 +8,6 @@ def component = "send-letter-service-container-new"
 
 withPipeline(type, product, component) {
     nonServiceApp()
+    enableAksStagingDeployment()
     syncBranchesWithMaster(['demo', 'perftest'])
 }
