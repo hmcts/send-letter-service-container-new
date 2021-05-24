@@ -38,7 +38,6 @@ public class BlobReader {
             Optional<String> blobName  = containerClient.listBlobs().stream().parallel()
                     .filter(obj -> obj.getName().startsWith("manifest")).findAny().map(BlobItem::getName);
 
-
             if (blobName.isPresent()) {
                 LOG.info("BlobReader:: ServiceName {}, Container {}, Blob name: {}", serviceName,
                         containerName, blobName.get());
