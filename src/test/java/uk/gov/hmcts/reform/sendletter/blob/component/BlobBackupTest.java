@@ -5,6 +5,7 @@ import com.azure.storage.blob.BlobClientBuilder;
 import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.BlobServiceClientBuilder;
+import com.azure.storage.blob.models.BlobStorageException;
 import com.azure.storage.common.StorageSharedKeyCredential;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -25,6 +26,7 @@ import java.io.IOException;
 import static com.google.common.base.Charsets.UTF_8;
 import static com.google.common.io.Resources.getResource;
 import static java.util.Collections.singletonList;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -65,7 +67,6 @@ class BlobBackupTest {
         mapper = new ObjectMapper();
         given(blobManager.getAccountUrl()).willReturn("http://test.account");
 
-
         StorageSharedKeyCredential storageCredentials =
                 new StorageSharedKeyCredential("testAccountName", "dGVzdGtleQ==");
 
@@ -79,9 +80,7 @@ class BlobBackupTest {
         SasTokenGeneratorService sasTokenGeneratorService = new SasTokenGeneratorService(blobServiceClient,
                 accessTokenProperties);
         blobBackup = new BlobBackup(blobManager, sasTokenGeneratorService, mapper);
-
         sasToken = sasTokenGeneratorService.generateSasToken(TEST_SERVICE_NAME);
-
         var sourceBlobClient = new BlobClientBuilder()
                 .endpoint(blobManager.getAccountUrl())
                 .sasToken(sasToken)
@@ -90,10 +89,6 @@ class BlobBackupTest {
                 .buildClient();
 
         blobInfo = new ManifestBlobInfo(TEST_SERVICE_NAME, NEW_CONTAINER, BLOB_NAME);
-        given(blobManager.getContainerClient(BACKUP_CONTAINER)).willReturn(destContainerClient);
-        given(destContainerClient.getBlobClient(anyString())).willReturn(destBlobClient);
-        given(blobManager.getBlobClient(any(), any(), any())).willReturn(client);
-
         mapper = spy(mapper);
         json = Resources.toString(getResource("print_job_response.json"), UTF_8);
         mapper.registerModule(new JavaTimeModule());
@@ -108,6 +103,9 @@ class BlobBackupTest {
 
     @Test
     void should_copy_blob_with_path_from_new_container_to_backup_container() {
+        given(blobManager.getContainerClient(BACKUP_CONTAINER)).willReturn(destContainerClient);
+        given(destContainerClient.getBlobClient(anyString())).willReturn(destBlobClient);
+        given(blobManager.getBlobClient(any(), any(), any())).willReturn(client);
         var response = blobBackup.backupBlobs(blobInfo);
         assertNotNull(response);
         verify(destBlobClient, times(3)).copyFromUrl(any());
@@ -116,6 +114,9 @@ class BlobBackupTest {
     @Test
     void should_copy_blob_without_path_from_new_container_to_backup_container() {
         String blobName = "print_job_response.json";
+        given(blobManager.getContainerClient(BACKUP_CONTAINER)).willReturn(destContainerClient);
+        given(destContainerClient.getBlobClient(anyString())).willReturn(destBlobClient);
+        given(blobManager.getBlobClient(any(), any(), any())).willReturn(client);
         var sourceBlobClient = new BlobClientBuilder()
                 .endpoint(blobManager.getAccountUrl())
                 .sasToken(sasToken)
@@ -128,6 +129,16 @@ class BlobBackupTest {
         var response = blobBackup.backupBlobs(blobInfo);
         assertNotNull(response);
         verify(destBlobClient, times(3)).copyFromUrl(any());
+    }
+
+    @Test
+    void should_throw_exception_when_blob_do_not_exist() {
+        var blobStorageException = new BlobStorageException("The specified blob does not exist", null, null);
+        given(destBlobClient.copyFromUrl(any())).willThrow(blobStorageException);
+
+        assertThatThrownBy(() -> destBlobClient.copyFromUrl(any()))
+                .isInstanceOf(BlobStorageException.class)
+                .hasMessage("The specified blob does not exist");
     }
 
     private void createAccessTokenConfig() {

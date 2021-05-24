@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sendletter.blob;
 
 import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobContainerClient;
+import com.azure.storage.blob.models.BlobStorageException;
 import com.azure.storage.blob.specialized.BlobLeaseClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -27,10 +28,12 @@ import java.util.Optional;
 
 import static com.google.common.base.Charsets.UTF_8;
 import static com.google.common.io.Resources.getResource;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
@@ -59,16 +62,17 @@ class BlobProcessorTest {
     private BlobLeaseClient blobLeaseClient;
 
     @BeforeEach
-    void setUp() throws IOException {
+    void setUp() {
         blobInfo = new ManifestBlobInfo("sscs", "new-sscs",
                 "manifests-xyz.json");
         processBlob = new BlobProcessor(blobReader, blobBackup, blobStitch, blobDelete,
                 blobManager, leaseClientProvider, 10);
-        given(blobReader.retrieveManifestsToProcess()).willReturn(Optional.of(blobInfo));
+
     }
 
     @Test
     void should_process_blob_when_triggered() throws IOException {
+        given(blobReader.retrieveManifestsToProcess()).willReturn(Optional.of(blobInfo));
         given(blobManager.getContainerClient(any())).willReturn(blobContainerClient);
         given(blobContainerClient.getBlobClient(any())).willReturn(blobClient);
         given(leaseClientProvider.get(blobClient)).willReturn(blobLeaseClient);
@@ -105,4 +109,14 @@ class BlobProcessorTest {
         given(blobReader.retrieveManifestsToProcess()).willReturn(Optional.empty());
         assertFalse(processBlob.read());
     }
+
+    @Test
+    void should_throw_exception()  {
+        var blobStorageException = new BlobStorageException("There is already a lease present for blob", null, null);
+        given(blobLeaseClient.acquireLease(anyInt())).willThrow(blobStorageException);
+        assertThatThrownBy(() -> blobLeaseClient.acquireLease(anyInt()))
+                .isInstanceOf(BlobStorageException.class)
+                .hasMessageContaining("There is already a lease present for blob");
+    }
+
 }
