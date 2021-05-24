@@ -55,7 +55,7 @@ public class BlobReader {
     }
 
     private int getRandomIndex(int min, int max) {
-        SecureRandom random = new SecureRandom();
+        var random = new SecureRandom();
         return random.ints(min, max)
                 .findFirst()
                 .orElse(0);
