@@ -1,12 +1,15 @@
 package uk.gov.hmcts.reform.sendletter.blob.component;
 
 import com.azure.storage.blob.models.BlobItem;
+import com.microsoft.applicationinsights.web.dependencies.apachecommons.lang3.RandomUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sendletter.config.AccessTokenProperties;
 import uk.gov.hmcts.reform.sendletter.model.in.ManifestBlobInfo;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Optional;
@@ -55,7 +58,7 @@ public class BlobReader {
     }
 
     private int getRandomIndex(int min, int max) {
-        var random = new Random();
+        SecureRandom random = new SecureRandom();
         return random.ints(min, max)
                 .findFirst()
                 .orElse(0);
