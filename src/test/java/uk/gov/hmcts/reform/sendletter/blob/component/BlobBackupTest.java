@@ -135,8 +135,7 @@ class BlobBackupTest {
     void should_throw_exception_when_blob_do_not_exist() {
         var blobStorageException = new BlobStorageException("The specified blob does not exist", null, null);
         given(destBlobClient.copyFromUrl(any())).willThrow(blobStorageException);
-
-        assertThatThrownBy(() -> destBlobClient.copyFromUrl(any()))
+        assertThatThrownBy(this::call)
                 .isInstanceOf(BlobStorageException.class)
                 .hasMessage("The specified blob does not exist");
     }
@@ -148,5 +147,9 @@ class BlobBackupTest {
 
         accessTokenProperties = new AccessTokenProperties();
         accessTokenProperties.setServiceConfig(singletonList(tokenConfig));
+    }
+
+    private void call() {
+        destBlobClient.copyFromUrl(any());
     }
 }
