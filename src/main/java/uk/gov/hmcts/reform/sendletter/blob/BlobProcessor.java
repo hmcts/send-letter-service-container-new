@@ -45,7 +45,7 @@ public class BlobProcessor {
     }
 
     public boolean read() throws IOException {
-        LOG.info("BlobProcessor:: proccessing blobs");
+        LOG.info("BlobProcessor:: keda proccessing blobs");
         Optional<ManifestBlobInfo> blobInfo = blobReader.retrieveManifestsToProcess();
         if (blobInfo.isPresent()) {
             try {
