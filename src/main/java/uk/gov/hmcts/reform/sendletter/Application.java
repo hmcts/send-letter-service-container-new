@@ -8,8 +8,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import uk.gov.hmcts.reform.sendletter.blob.BlobProcessor;
 
-import java.io.IOException;
-
 @SuppressWarnings("HideUtilityClassConstructor")
 @SpringBootApplication
 public class Application implements CommandLineRunner {
@@ -27,7 +25,7 @@ public class Application implements CommandLineRunner {
         try {
             LOGGER.info("send letter new KEDA container invoked");
             retrieve.read();
-        } catch (IOException e) {
+        } catch (Exception e) {
             LOGGER.info("Exception occured while KEDA container invoked", e);
         }
     }

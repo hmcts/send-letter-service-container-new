@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sendletter.blob.component;
 
-import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.models.BlobItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,7 +9,9 @@ import uk.gov.hmcts.reform.sendletter.model.in.ManifestBlobInfo;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Optional;
+import java.util.List;
+
+import static java.util.stream.Collectors.toList;
 
 @Component
 public class BlobReader {
@@ -25,26 +26,32 @@ public class BlobReader {
         this.accessTokenProperties = accessTokenProperties;
     }
 
-    public Optional<ManifestBlobInfo> retrieveManifestsToProcess() {
+    public List<ManifestBlobInfo> retrieveManifestsToProcess() {
         LOG.info("About to read manifests details");
         var containers = new ArrayList<>(accessTokenProperties.getServiceConfig());
         Collections.shuffle(containers);
+        var counter = 0;
+        List<ManifestBlobInfo> manifestBlobList = Collections.emptyList();
 
-        for (AccessTokenProperties.TokenConfig config : containers) {
-            String serviceName = config.getServiceName();
-            String containerName = config.getNewContainerName();
+        while (manifestBlobList.isEmpty()
+                && counter < containers.size()) {
+            var tokenConfig = containers.get(counter++);
+            String serviceName = tokenConfig.getServiceName();
+            String containerName = tokenConfig.getNewContainerName();
 
-            BlobContainerClient containerClient = blobManager.getContainerClient(containerName);
-            Optional<String> blobName  = containerClient.listBlobs().stream().parallel()
-                    .filter(obj -> obj.getName().startsWith("manifest")).findAny().map(BlobItem::getName);
+            var containerClient = blobManager.getContainerClient(containerName);
 
-            if (blobName.isPresent()) {
-                LOG.info("BlobReader:: ServiceName {}, Container {}, Blob name: {}", serviceName,
-                        containerName, blobName.get());
-                return Optional.of(new ManifestBlobInfo(serviceName, containerName, blobName.get()));
-            }
+            manifestBlobList = containerClient.listBlobs().stream()
+                    .map(BlobItem::getName)
+                    .filter(fileName -> fileName.startsWith("manifest"))
+                    .map(fileName ->
+                            new ManifestBlobInfo(
+                                    serviceName,
+                                    containerName,
+                                    fileName)
+                    )
+                    .collect(toList());
         }
-
-        return Optional.empty();
+        return manifestBlobList;
     }
 }

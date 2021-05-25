@@ -18,7 +18,7 @@ public class BlobDelete {
         this.sasTokenGeneratorService  = sasTokenGeneratorService;
     }
 
-    public Boolean deleteOriginalBlobs(DeleteBlob deleteBlob) {
+    public boolean deleteOriginalBlobs(DeleteBlob deleteBlob) {
         var serviceName = deleteBlob.getServiceName();
         var containerName = deleteBlob.getContainerName();
         var blobs = deleteBlob.getBlobName();

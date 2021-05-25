@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sendletter.blob;
 
 import com.azure.core.util.Context;
 import com.azure.storage.blob.models.BlobRequestConditions;
-import com.azure.storage.blob.models.BlobStorageException;
 import com.azure.storage.blob.models.DeleteSnapshotsOptionType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,9 +14,6 @@ import uk.gov.hmcts.reform.sendletter.blob.component.BlobReader;
 import uk.gov.hmcts.reform.sendletter.blob.component.BlobStitch;
 import uk.gov.hmcts.reform.sendletter.blob.storage.LeaseClientProvider;
 import uk.gov.hmcts.reform.sendletter.model.in.ManifestBlobInfo;
-
-import java.io.IOException;
-import java.util.Optional;
 
 @Service
 public class BlobProcessor {
@@ -44,35 +40,39 @@ public class BlobProcessor {
         this.leaseTime = leaseTime;
     }
 
-    public boolean read() throws IOException {
-        LOG.info("BlobProcessor:: keda proccessing blobs");
-        Optional<ManifestBlobInfo> blobInfo = blobReader.retrieveManifestsToProcess();
-        if (blobInfo.isPresent()) {
-            try {
-                var containerClient  = blobManager.getContainerClient(blobInfo.get().getContainerName());
-                var blobClient = containerClient.getBlobClient(blobInfo.get().getBlobName());
-                var leaseClient = leaseClientProvider.get(blobClient);
-                var leaseId = leaseClient.acquireLease(leaseTime);
-                LOG.info("BlobProcessor::blob {} has been leased for {} seconds with leaseId {}",
-                        blobInfo.get().getBlobName(), leaseTime, leaseId);
-                var printResponse = blobBackup.backupBlobs(blobInfo.get());
-                LOG.info("BlobProcessor:: backup blobs response {}", printResponse);
-                var deleteBlob = blobStitch.stitchBlobs(printResponse);
-                blobClient.deleteWithResponse(
-                        DeleteSnapshotsOptionType.INCLUDE,
-                        new BlobRequestConditions().setLeaseId(leaseId),
-                        null,
-                        Context.NONE);
-                blobDelete.deleteOriginalBlobs(deleteBlob);
-                LOG.info("BlobProcessor:: delete original blobs");
-            } catch (BlobStorageException bse) {
-                LOG.error("There is already a lease present for blob {}", blobInfo.get().getBlobName(), bse);
-            }
-        } else {
-            LOG.info("BlobProcessor:: no blobs for proccessing.");
-            return false;
-        }
+    public boolean read() {
+        LOG.info("BlobProcessor:: proccessing blob");
 
-        return true;
+        return blobReader.retrieveManifestsToProcess()
+                .stream()
+                .map(this::process)
+                .filter(Boolean::valueOf)
+                .findFirst()
+                .orElse(false);
+    }
+
+    private boolean process(ManifestBlobInfo manifestBlobInfo) {
+        var status = false;
+        try {
+            var containerClient  = blobManager.getContainerClient(manifestBlobInfo.getContainerName());
+            var blobClient = containerClient.getBlobClient(manifestBlobInfo.getBlobName());
+            var leaseClient = leaseClientProvider.get(blobClient);
+            var leaseId = leaseClient.acquireLease(leaseTime);
+            LOG.info("BlobProcessor::blob {} has been leased for {} seconds with leaseId {}",
+                    manifestBlobInfo.getBlobName(), leaseTime, leaseId);
+            var printResponse = blobBackup.backupBlobs(manifestBlobInfo);
+            LOG.info("BlobProcessor:: backup blobs response {}", printResponse);
+            var deleteBlob = blobStitch.stitchBlobs(printResponse);
+            blobClient.deleteWithResponse(
+                    DeleteSnapshotsOptionType.INCLUDE,
+                    new BlobRequestConditions().setLeaseId(leaseId),
+                    null,
+                    Context.NONE);
+            status = blobDelete.deleteOriginalBlobs(deleteBlob);
+            LOG.info("BlobProcessor:: delete original blobs");
+        } catch (Exception e) {
+            LOG.error("Exception processing blob {}", manifestBlobInfo.getBlobName(), e);
+        }
+        return status;
     }
 }
