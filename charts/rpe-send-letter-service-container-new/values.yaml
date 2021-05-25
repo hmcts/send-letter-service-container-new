@@ -12,7 +12,8 @@ function:
         - name: app-insights-instrumentation-key
           alias: azure.application-insights.instrumentation-key
   job:
-    activeDeadlineSeconds: 300          
+    activeDeadlineSeconds: 300
+    ttlSecondsAfterFinished: 600
   triggerAuth:
     enabled: true
   triggers:
