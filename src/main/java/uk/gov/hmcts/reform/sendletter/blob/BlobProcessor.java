@@ -52,7 +52,7 @@ public class BlobProcessor {
     }
 
     private boolean process(ManifestBlobInfo manifestBlobInfo) {
-        boolean status = false;
+        var status = false;
         try {
             var containerClient  = blobManager.getContainerClient(manifestBlobInfo.getContainerName());
             var blobClient = containerClient.getBlobClient(manifestBlobInfo.getBlobName());

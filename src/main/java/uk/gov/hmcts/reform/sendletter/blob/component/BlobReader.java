@@ -30,14 +30,18 @@ public class BlobReader {
         LOG.info("About to read manifests details");
         var containers = new ArrayList<>(accessTokenProperties.getServiceConfig());
         Collections.shuffle(containers);
+        var counter = 0;
+        List<ManifestBlobInfo> manifestBlobList = Collections.emptyList();
 
-        for (AccessTokenProperties.TokenConfig config : containers) {
-            String serviceName = config.getServiceName();
-            String containerName = config.getNewContainerName();
+        while (manifestBlobList.isEmpty()
+                && counter < containers.size()) {
+            var tokenConfig = containers.get(counter++);
+            String serviceName = tokenConfig.getServiceName();
+            String containerName = tokenConfig.getNewContainerName();
 
             var containerClient = blobManager.getContainerClient(containerName);
 
-            return containerClient.listBlobs().stream()
+            manifestBlobList = containerClient.listBlobs().stream()
                     .map(BlobItem::getName)
                     .filter(fileName -> fileName.startsWith("manifest"))
                     .map(fileName ->
@@ -48,6 +52,6 @@ public class BlobReader {
                     )
                     .collect(toList());
         }
-        return Collections.emptyList();
+        return manifestBlobList;
     }
 }
