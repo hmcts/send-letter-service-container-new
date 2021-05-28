@@ -106,6 +106,7 @@ public class BlobStitch {
     }
 
     private String generatePdfName(String type, String serviceName, UUID id) {
-        return type + SEPARATOR + serviceName + SEPARATOR + id + ".pdf";
+        String strippedService = serviceName.replace(SEPARATOR, "");
+        return type + SEPARATOR + strippedService + SEPARATOR + id + ".pdf";
     }
 }
