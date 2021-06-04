@@ -24,7 +24,7 @@ accesstoken:
     - serviceName: fpl
       newContainerName: new-fpl
       validity: ${SAS_TOKEN_VALIDITY:300} #In seconds`
-    - serviceName: nfdivorce
+    - serviceName: nfdiv_case_api
       newContainerName: new-nfdivorce
       validity: ${SAS_TOKEN_VALIDITY:300} #In seconds
     - serviceName: probate
