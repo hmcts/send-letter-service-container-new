@@ -186,6 +186,15 @@ dependencyManagement {
       entry 'netty-resolver-dns'
       entry 'netty-resolver-dns-native-macos'
     }
+    // CVE-2021-22118
+    dependencySet(group: 'org.springframework', version: '5.3.5') {
+      entry 'spring-aop'
+      entry 'spring-beans'
+      entry 'spring-context'
+      entry 'spring-core'
+      entry 'spring-expression'
+      entry 'spring-jcl'
+    }
   }
 }
 
@@ -213,20 +222,6 @@ ext.libraries = [
     "org.junit.platform:junit-platform-engine:${versions.junitPlatform}"
   ]
 ]
-
-dependencyManagement {
-  dependencies {
-    // CVE-2021-22118
-    dependencySet(group: 'org.springframework', version: '5.3.5') {
-      entry 'spring-aop'
-      entry 'spring-beans'
-      entry 'spring-context'
-      entry 'spring-core'
-      entry 'spring-expression'
-      entry 'spring-jcl'
-    }
-  }
-}
 
 dependencies {
   def withoutJunit4 = {
