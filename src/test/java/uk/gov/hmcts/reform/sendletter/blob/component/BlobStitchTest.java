@@ -82,7 +82,7 @@ class BlobStitchTest {
         SasTokenGeneratorService sasTokenGeneratorService = new SasTokenGeneratorService(blobServiceClient,
                 accessTokenProperties);
 
-        blobStitch = new BlobStitch(blobManager, sasTokenGeneratorService, pdfCreator);
+        blobStitch = new BlobStitch(blobManager, sasTokenGeneratorService, pdfCreator, PROCESSED_CONTAINER);
 
         var sasToken = sasTokenGeneratorService.generateSasToken(TEST_SERVICE_NAME);
 
