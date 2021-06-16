@@ -101,7 +101,7 @@ class BlobReaderTest {
         AccessTokenProperties.TokenConfig tokenConfig = new AccessTokenProperties.TokenConfig();
         tokenConfig.setValidity(300);
         tokenConfig.setServiceName(SERVICE);
-        tokenConfig.setNewContainerName(CONTAINER);
+        tokenConfig.setContainerName(CONTAINER);
         accessTokenProperties = new AccessTokenProperties();
         accessTokenProperties.setServiceConfig(singletonList(tokenConfig));
     }

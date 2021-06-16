@@ -4,8 +4,8 @@ import com.azure.storage.blob.models.BlobStorageException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.sendletter.config.AccessTokenProperties;
 import uk.gov.hmcts.reform.sendletter.model.in.BlobInfo;
 import uk.gov.hmcts.reform.sendletter.model.in.Document;
 import uk.gov.hmcts.reform.sendletter.model.in.PrintResponse;
@@ -26,11 +26,11 @@ public class BlobBackup2 {
     public BlobBackup2(BlobManager blobManager,
             SasTokenGeneratorService sasTokenGeneratorService,
             ObjectMapper mapper,
-            @Value("${storage.backup-container}") String backupContainer) {
+            AccessTokenProperties accessTokenProperties) {
         this.blobManager =  blobManager;
         this.sasTokenGeneratorService  = sasTokenGeneratorService;
         this.mapper = mapper;
-        this.backupContainer = backupContainer;
+        this.backupContainer = accessTokenProperties.getContainerForGivenService("send_letter_backup");
     }
 
     public PrintResponse backupBlobs(BlobInfo blobInfo) {
@@ -38,6 +38,7 @@ public class BlobBackup2 {
         try {
             var sourceBlobClient = blobInfo.getBlobClient();
             var sourceContainerName =  blobInfo.getContainerName();
+            var serviceName = blobInfo.getServiceName();
             var manifestBlob = sourceBlobClient.getBlobName();
             LOG.info("back up blobs blobName {}", manifestBlob);
 
@@ -46,16 +47,19 @@ public class BlobBackup2 {
                 printResponse = mapper.readValue(bytes, PrintResponse.class);
 
                 if (printResponse != null && printResponse.printJob != null && printResponse.printJob.documents != null) {
-                    var sasToken = sasTokenGeneratorService.generateSasToken(backupContainer);
+
+                    var sourceSasToken = sasTokenGeneratorService.generateSasToken(serviceName);
+                    var destSasToken = sasTokenGeneratorService.generateSasToken("send_letter_backup");
+
                     for (Document m : printResponse.printJob.documents) {
                         var actualPdfFile = m.uploadToPath;
 
                         LOG.info("Document FileName {}, NoOfCopies {}, pdfContent {}", m.fileName, m.copies,
                                 actualPdfFile);
-                        doBackup(sourceContainerName, actualPdfFile, sasToken);
+                        doBackup(sourceContainerName, actualPdfFile, sourceSasToken, destSasToken);
                     }
-                    var destBlobClient = blobManager.getBlobClient(backupContainer, sasToken, manifestBlob);
                     //backup manifestBlob
+                    var destBlobClient = blobManager.getBlobClient(backupContainer, destSasToken, manifestBlob);
                     destBlobClient.upload(new ByteArrayInputStream(bytes), bytes.length);
                 }
             }
@@ -66,11 +70,11 @@ public class BlobBackup2 {
         return printResponse;
     }
 
-    private void doBackup(String sourceContainer, String pdfFile, String sasToken) {
+    private void doBackup(String sourceContainer, String pdfFile, String sourceSasToken, String destSasToken) {
         LOG.info("About to backup original blob in backup container");
         try {
-            var sourceBlobClient = blobManager.getBlobClient(sourceContainer, sasToken, pdfFile);
-            var destBlobClient = blobManager.getBlobClient(backupContainer, sasToken, pdfFile);
+            var sourceBlobClient = blobManager.getBlobClient(sourceContainer, sourceSasToken, pdfFile);
+            var destBlobClient = blobManager.getBlobClient(backupContainer, destSasToken, pdfFile);
 
             try (var blobInputStream = sourceBlobClient.openInputStream()) {
                 byte[] bytes = blobInputStream.readAllBytes();

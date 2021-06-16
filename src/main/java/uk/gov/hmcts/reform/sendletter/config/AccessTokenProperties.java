@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sendletter.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
+import uk.gov.hmcts.reform.sendletter.exceptions.ServiceConfigNotFoundException;
 
 import java.util.List;
 
@@ -18,10 +19,21 @@ public class AccessTokenProperties {
         this.serviceConfig = serviceConfig;
     }
 
+    public String getContainerForGivenService(final String service) {
+        return getServiceConfig().stream()
+                .filter(tokenConfig -> service.equals(tokenConfig.getServiceName()))
+                .map(AccessTokenProperties.TokenConfig::getContainerName)
+                .findFirst()
+                .orElseThrow(() ->
+                        new ServiceConfigNotFoundException(
+                                "No container found for service " + service));
+    }
+
+
     public static class TokenConfig {
         private String serviceName;
         private int validity;
-        private String newContainerName;
+        private String containerName;
 
         public String getServiceName() {
             return serviceName;
@@ -39,12 +51,12 @@ public class AccessTokenProperties {
             this.validity = validity;
         }
 
-        public String getNewContainerName() {
-            return newContainerName;
+        public String getContainerName() {
+            return containerName;
         }
 
-        public void setNewContainerName(String newContainerName) {
-            this.newContainerName = newContainerName;
+        public void setContainerName(String containerName) {
+            this.containerName = containerName;
         }
     }
 }

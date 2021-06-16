@@ -15,7 +15,7 @@ import uk.gov.hmcts.reform.sendletter.config.AccessTokenProperties;
 import uk.gov.hmcts.reform.sendletter.config.AccessTokenProperties.TokenConfig;
 
 import java.util.List;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 import static java.util.List.of;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -87,6 +87,8 @@ class BlobReader2Test {
 
         var blobInfo = mayBeBlobInfo.get();
         assertThat(blobInfo.isLeased()).isTrue();
+        assertThat(blobInfo.getServiceName()).isEqualTo("send_letter_tests");
+        assertThat(blobInfo.getContainerName()).isEqualTo("new-bulkprint");
 
         verify(blobManager).getContainerClient("new-bulkprint");
         verify(blobContainerClient, times(3))
@@ -98,20 +100,20 @@ class BlobReader2Test {
     }
 
     private void createAccessTokenConfig() {
-        Function<String,TokenConfig> tokenFunction = container -> {
-            TokenConfig tokenConfig = new TokenConfig();
+        BiFunction<String, String, TokenConfig> tokenFunction = (service, container) -> {
+            AccessTokenProperties.TokenConfig tokenConfig = new AccessTokenProperties.TokenConfig();
             tokenConfig.setValidity(300);
-            tokenConfig.setServiceName("send_letter_tests");
-            tokenConfig.setNewContainerName(container);
+            tokenConfig.setServiceName(service);
+            tokenConfig.setContainerName(container);
             return tokenConfig;
         };
         accessTokenProperties = new AccessTokenProperties();
         accessTokenProperties.setServiceConfig(
                 of(
-                    tokenFunction.apply("new-bulkprint")
+                    tokenFunction.apply("send_letter_tests", "new-bulkprint"),
+                    tokenFunction.apply("send_letter_backup", "backup"),
+                    tokenFunction.apply("send_letter_process", "processed")
                 )
         );
     }
-
-
 }

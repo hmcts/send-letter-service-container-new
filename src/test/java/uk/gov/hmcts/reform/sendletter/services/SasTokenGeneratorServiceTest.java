@@ -82,7 +82,7 @@ class SasTokenGeneratorServiceTest {
         AccessTokenProperties.TokenConfig tokenConfig = new AccessTokenProperties.TokenConfig();
         tokenConfig.setValidity(300);
         tokenConfig.setServiceName("bulkprint");
-        tokenConfig.setNewContainerName("new");
+        tokenConfig.setContainerName("new");
         accessTokenProperties = new AccessTokenProperties();
         accessTokenProperties.setServiceConfig(singletonList(tokenConfig));
     }

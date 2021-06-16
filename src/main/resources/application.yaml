@@ -9,34 +9,38 @@ spring:
 storage:
   connection: ${STORAGE_ACCOUNT_CONNECTION_STRING}
   leaseTime: ${BLOB_LEASE_TIME:20} #In seconds
-  backup-container: "backup"
-  processed-container: "processed"
 
 accesstoken:
   serviceConfig:
     - serviceName: cmc
-      newContainerName: new-cmc
+      containerName: new-cmc
       validity: ${SAS_TOKEN_VALIDITY:300} #In seconds
     - serviceName: divorce
-      newContainerName: new-divorce
+      containerName: new-divorce
       validity: ${SAS_TOKEN_VALIDITY:300} #In seconds
     - serviceName: finrem
-      newContainerName: new-finrem
+      containerName: new-finrem
       validity: ${SAS_TOKEN_VALIDITY:300} #In seconds
     - serviceName: fpl
-      newContainerName: new-fpl
+      containerName: new-fpl
       validity: ${SAS_TOKEN_VALIDITY:300} #In seconds`
     - serviceName: nfdiv_case_api
-      newContainerName: new-nfdivorce
+      containerName: new-nfdivorce
       validity: ${SAS_TOKEN_VALIDITY:300} #In seconds
     - serviceName: probate
-      newContainerName: new-probate
+      containerName: new-probate
       validity: ${SAS_TOKEN_VALIDITY:300} #In seconds
     - serviceName: sscs
-      newContainerName: new-sscs
+      containerName: new-sscs
       validity: ${SAS_TOKEN_VALIDITY:300} #In seconds
     - serviceName: send_letter_tests
-      newContainerName: new-bulkprint
+      containerName: new-bulkprint
+      validity: ${SAS_TOKEN_VALIDITY:300}
+    - serviceName: send_letter_backup
+      containerName: backup
+      validity: ${SAS_TOKEN_VALIDITY:300}
+    - serviceName: send_letter_process
+      containerName: processed
       validity: ${SAS_TOKEN_VALIDITY:300}
 
 

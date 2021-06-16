@@ -8,9 +8,9 @@ import uk.gov.hmcts.reform.sendletter.blob.storage.LeaseClientProvider;
 import uk.gov.hmcts.reform.sendletter.config.AccessTokenProperties;
 import uk.gov.hmcts.reform.sendletter.model.in.BlobInfo;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 public class BlobReader2 {
@@ -34,14 +34,17 @@ public class BlobReader2 {
 
     public Optional<BlobInfo> retrieveBlobToProcess() {
         LOG.info("About to read manifests details from new container");
-        var containers = new ArrayList<>(accessTokenProperties.getServiceConfig());
+        var containers = accessTokenProperties.getServiceConfig().stream().
+                filter(t -> t.getContainerName().startsWith("new-")).
+                collect(Collectors.toList());
         Collections.shuffle(containers);
         var counter = 0;
 
         Optional<BlobInfo> manifest = Optional.empty();
         while (manifest.isEmpty() && counter < containers.size()) {
             var tokenConfig = containers.get(counter++);
-            var containerName = tokenConfig.getNewContainerName();
+            var containerName = tokenConfig.getContainerName();
+            var serviceName = tokenConfig.getServiceName();
             var containerClient = blobManager.getContainerClient(containerName);
 
             manifest = containerClient.listBlobs().stream()
@@ -52,7 +55,7 @@ public class BlobReader2 {
                             )
                     )
                     .filter(blobInfo -> {
-                        this.acquireLease(blobInfo, containerName);
+                        this.acquireLease(blobInfo, containerName, serviceName);
                         return blobInfo.isLeased();
                     })
                     .findFirst();
@@ -60,12 +63,13 @@ public class BlobReader2 {
         return manifest;
     }
 
-    private void acquireLease(BlobInfo blobInfo, String containerName) {
+    private void acquireLease(BlobInfo blobInfo, String containerName, String serviceName) {
         try {
             var blobLeaseClient = leaseClientProvider.get(blobInfo.getBlobClient());
             var leaseId = blobLeaseClient.acquireLease(leaseTime);
             blobInfo.setLeaseId(leaseId);
             blobInfo.setContainerName(containerName);
+            blobInfo.setServiceName(serviceName);
         } catch (Exception e) {
             LOG.error("Unable to acquire lease for blob {}",
                     blobInfo.getBlobClient().getBlobName(),

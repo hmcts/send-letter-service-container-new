@@ -37,7 +37,7 @@ public class BlobReader {
                 && counter < containers.size()) {
             var tokenConfig = containers.get(counter++);
             String serviceName = tokenConfig.getServiceName();
-            String containerName = tokenConfig.getNewContainerName();
+            String containerName = tokenConfig.getContainerName();
 
             var containerClient = blobManager.getContainerClient(containerName);
 

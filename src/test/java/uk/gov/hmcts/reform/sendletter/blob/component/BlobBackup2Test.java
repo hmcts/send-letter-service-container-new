@@ -19,12 +19,13 @@ import uk.gov.hmcts.reform.sendletter.services.SasTokenGeneratorService;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 import static com.google.common.base.Charsets.UTF_8;
 import static java.util.List.of;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.spy;
@@ -35,10 +36,10 @@ import static org.mockito.Mockito.verify;
 class BlobBackup2Test {
 
     private static final String TEST_NEW_CONTAINER = "new-bulkprint";
-    private static final String BACKUP_CONTAINER = "backup";
+    private static final String TEST_BACKUP_CONTAINER = "backup";
+    private static final String TEST_NEW_SERVICE = "send_letter_tests";
+    private static final String TEST_BACKUP_SERVICE = "send_letter_backup";
     private static final String TEST_BLOB_NAME = "manifest-/print_job_response.json";
-    private static final String TEST_PDF_1 = "33dffc2f-94e0-4584-a973-cc56849ecc0b-sscs-SSC001-mypdf.pdf";
-    private static final String TEST_PDF_2 = "33dffc2f-94e0-4584-a973-cc56849ecc0b-sscs-SSC001-1.pdf";
 
     @Mock
     private BlobManager blobManager;
@@ -50,7 +51,9 @@ class BlobBackup2Test {
     private PrintResponse printResponse;
     @Mock
     private BlobClient blobClient;
-
+    @Mock
+    private BlobClient destBlobClient;
+    private AccessTokenProperties accessTokenProperties;
     private BlobBackup2 blobBackup;
     private ObjectMapper mapper;
 
@@ -62,17 +65,19 @@ class BlobBackup2Test {
         blobBackup = new BlobBackup2(blobManager,
                 sasTokenGeneratorService,
                 mapper,
-                BACKUP_CONTAINER);
+                accessTokenProperties);
     }
 
     @Test
     void should_copy_blob_with_path_from_new_container_to_backup_container() throws IOException {
         var sasToken = "sasToken";
+        //given(blobManager.getBlobClient(eq(TEST_NEW_CONTAINER), eq(sasToken), any())).willReturn(blobClient);
         given(blobClient.getBlobName()).willReturn(TEST_BLOB_NAME);
         var blobInfo = new BlobInfo(blobClient);
         blobInfo.setLeaseId("LEASE_ID");
         blobInfo.setContainerName(TEST_NEW_CONTAINER);
-
+        blobInfo.setServiceName(TEST_NEW_SERVICE);
+        //given(blobManager.getBlobClient(eq(TEST_BACKUP_CONTAINER), eq(sasToken), any())).willReturn(destBlobClient);
         given(blobManager.getBlobClient(any(), any(), any())).willReturn(blobClient);
         given(blobClient.openInputStream()).willReturn(blobInputStream);
 
@@ -85,28 +90,32 @@ class BlobBackup2Test {
         lenient().when(mapper.readValue(new ByteArrayInputStream(json.getBytes())
                 , PrintResponse.class)).thenReturn(printResponse);
 
-        given(sasTokenGeneratorService.generateSasToken(BACKUP_CONTAINER))
+        given(sasTokenGeneratorService.generateSasToken(TEST_NEW_SERVICE))
+                .willReturn(sasToken);
+        given(sasTokenGeneratorService.generateSasToken(TEST_BACKUP_SERVICE))
                 .willReturn(sasToken);
 
 
         var response = blobBackup.backupBlobs(blobInfo);
-        assertNotNull(response);
 
-        //verify(blobClient).upload(any(), any());
+        assertNotNull(response);
+        verify(blobManager, times(5)).getBlobClient(any(), any(), any());
+        verify(sasTokenGeneratorService).generateSasToken(TEST_NEW_SERVICE);
+        verify(sasTokenGeneratorService).generateSasToken(TEST_BACKUP_SERVICE);
     }
 
     private void createAccessTokenConfig() {
-        Function<String, TokenConfig> tokenFunction = container -> {
-            TokenConfig tokenConfig = new TokenConfig();
+        BiFunction<String, String, TokenConfig> tokenFunction = (service, container) -> {
+            AccessTokenProperties.TokenConfig tokenConfig = new AccessTokenProperties.TokenConfig();
             tokenConfig.setValidity(300);
-            tokenConfig.setServiceName("send_letter_tests");
-            tokenConfig.setNewContainerName(container);
+            tokenConfig.setServiceName(service);
+            tokenConfig.setContainerName(container);
             return tokenConfig;
         };
-        AccessTokenProperties accessTokenProperties = new AccessTokenProperties();
+        accessTokenProperties = new AccessTokenProperties();
         accessTokenProperties.setServiceConfig(
                 of(
-                        tokenFunction.apply(BACKUP_CONTAINER)
+                        tokenFunction.apply("send_letter_backup", "backup")
                 )
         );
     }
