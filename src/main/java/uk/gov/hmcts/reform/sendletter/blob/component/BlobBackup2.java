@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sendletter.config.AccessTokenProperties;
+import uk.gov.hmcts.reform.sendletter.exceptions.BlobProcessException;
 import uk.gov.hmcts.reform.sendletter.model.in.BlobInfo;
 import uk.gov.hmcts.reform.sendletter.model.in.Document;
 import uk.gov.hmcts.reform.sendletter.model.in.PrintResponse;
@@ -83,8 +84,8 @@ public class BlobBackup2 {
             }
 
             LOG.info("Blob {} backup completed.", pdfFile);
-        } catch (BlobStorageException | IOException bse) {
-            LOG.error("The specified blob does not exist.", bse);
+        } catch (Exception e) {
+            throw new BlobProcessException("The specified blob does not exist.", e);
         }
     }
 }
