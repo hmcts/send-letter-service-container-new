@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sendletter.blob.component;
 
 import com.azure.storage.blob.models.BlobStorageException;
-import com.azure.storage.blob.specialized.BlobInputStream;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +11,7 @@ import uk.gov.hmcts.reform.sendletter.model.in.Document;
 import uk.gov.hmcts.reform.sendletter.model.in.PrintResponse;
 import uk.gov.hmcts.reform.sendletter.services.SasTokenGeneratorService;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 @Component
@@ -41,8 +41,9 @@ public class BlobBackup2 {
             var manifestBlob = sourceBlobClient.getBlobName();
             LOG.info("back up blobs blobName {}", manifestBlob);
 
-            try (BlobInputStream blobInputStream = sourceBlobClient.openInputStream()) {
-                printResponse = mapper.readValue(blobInputStream, PrintResponse.class);
+            try (var blobInputStream = sourceBlobClient.openInputStream()) {
+                byte[] bytes = blobInputStream.readAllBytes();
+                printResponse = mapper.readValue(bytes, PrintResponse.class);
 
                 if (printResponse != null && printResponse.printJob != null && printResponse.printJob.documents != null) {
                     var sasToken = sasTokenGeneratorService.generateSasToken(backupContainer);
@@ -55,7 +56,7 @@ public class BlobBackup2 {
                     }
                     var destBlobClient = blobManager.getBlobClient(backupContainer, sasToken, manifestBlob);
                     //backup manifestBlob
-                    destBlobClient.upload(blobInputStream,blobInputStream.getProperties().getBlobSize());
+                    destBlobClient.upload(new ByteArrayInputStream(bytes), bytes.length);
                 }
             }
 
@@ -72,11 +73,13 @@ public class BlobBackup2 {
             var destBlobClient = blobManager.getBlobClient(backupContainer, sasToken, pdfFile);
 
             try (var blobInputStream = sourceBlobClient.openInputStream()) {
-                destBlobClient.upload(blobInputStream, blobInputStream.getProperties().getBlobSize());
+                byte[] bytes = blobInputStream.readAllBytes();
+                var byteArrayInputStream = new ByteArrayInputStream(bytes);
+                destBlobClient.upload(byteArrayInputStream, bytes.length);
             }
 
             LOG.info("Blob {} backup completed.", pdfFile);
-        } catch (BlobStorageException bse) {
+        } catch (BlobStorageException | IOException bse) {
             LOG.error("The specified blob does not exist.", bse);
         }
     }
