@@ -25,7 +25,6 @@ import static com.google.common.base.Charsets.UTF_8;
 import static java.util.List.of;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.spy;
@@ -36,7 +35,7 @@ import static org.mockito.Mockito.verify;
 class BlobBackup2Test {
 
     private static final String TEST_NEW_CONTAINER = "new-bulkprint";
-    private static final String TEST_BACKUP_CONTAINER = "backup";
+    //private static final String TEST_BACKUP_CONTAINER = "backup";
     private static final String TEST_NEW_SERVICE = "send_letter_tests";
     private static final String TEST_BACKUP_SERVICE = "send_letter_backup";
     private static final String TEST_BLOB_NAME = "manifest-/print_job_response.json";
@@ -51,8 +50,6 @@ class BlobBackup2Test {
     private PrintResponse printResponse;
     @Mock
     private BlobClient blobClient;
-    @Mock
-    private BlobClient destBlobClient;
     private AccessTokenProperties accessTokenProperties;
     private BlobBackup2 blobBackup;
     private ObjectMapper mapper;
