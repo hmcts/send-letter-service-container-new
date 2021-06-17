@@ -5,7 +5,6 @@ import com.azure.storage.blob.models.BlobRequestConditions;
 import com.azure.storage.blob.models.DeleteSnapshotsOptionType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sendletter.blob.component.BlobBackup2;
 import uk.gov.hmcts.reform.sendletter.blob.component.BlobDelete;
@@ -22,16 +21,13 @@ public class BlobProcessor2 {
     private final BlobBackup2 blobBackup;
     private final BlobStitch blobStitch;
     private final BlobDelete blobDelete;
-    private final Integer leaseTime;
 
     public BlobProcessor2(BlobReader2 blobReader, BlobBackup2 blobBackup, BlobStitch blobStitch,
-                         BlobDelete blobDelete,
-                         @Value("${storage.leaseTime}") Integer leaseTime) {
+                         BlobDelete blobDelete) {
         this.blobReader = blobReader;
         this.blobBackup = blobBackup;
         this.blobStitch = blobStitch;
         this.blobDelete = blobDelete;
-        this.leaseTime = leaseTime;
     }
 
     public boolean read() {
@@ -53,7 +49,6 @@ public class BlobProcessor2 {
                     blobClient.getBlobName());
 
             var printResponse = blobBackup.backupBlobs(blobInfo);
-            LOG.info("BlobProcessor:: backup blobs response {}", printResponse);
             var deleteBlob = blobStitch.stitchBlobs(printResponse);
             String leaseId = blobInfo.getLeaseId()
                     .orElseThrow(() ->
