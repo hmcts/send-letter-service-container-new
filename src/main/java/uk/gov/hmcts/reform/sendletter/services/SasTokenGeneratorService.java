@@ -35,11 +35,11 @@ public class SasTokenGeneratorService {
 
     public String generateSasToken(String serviceName) {
         var config = getTokenConfigForService(serviceName);
-        LOG.info("SAS Token request received for container '{}'", config.getNewContainerName());
+        LOG.info("SAS Token request received for container '{}'", config.getContainerName());
 
         try {
             return blobServiceClient
-                    .getBlobContainerClient(config.getNewContainerName())
+                    .getBlobContainerClient(config.getContainerName())
                     .generateSas(createSharedAccessPolicy(config));
         } catch (Exception e) {
             throw new UnableToGenerateSasTokenException(e);
