@@ -50,7 +50,7 @@ public class BlobProcessor2 {
 
             var printResponse = blobBackup.backupBlobs(blobInfo);
             var deleteBlob = blobStitch.stitchBlobs(printResponse);
-            String leaseId = blobInfo.getLeaseId()
+            var leaseId = blobInfo.getLeaseId()
                     .orElseThrow(() ->
                             new LeaseIdNotPresentException("Lease not present"));
             blobClient.deleteWithResponse(
