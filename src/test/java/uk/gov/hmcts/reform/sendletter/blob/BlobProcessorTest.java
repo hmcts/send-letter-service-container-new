@@ -15,6 +15,8 @@ import uk.gov.hmcts.reform.sendletter.blob.component.BlobDelete;
 import uk.gov.hmcts.reform.sendletter.blob.component.BlobManager;
 import uk.gov.hmcts.reform.sendletter.blob.component.BlobReader;
 import uk.gov.hmcts.reform.sendletter.blob.component.BlobStitch;
+import uk.gov.hmcts.reform.sendletter.exceptions.BlobProcessException;
+import uk.gov.hmcts.reform.sendletter.exceptions.LeaseIdNotPresentException;
 import uk.gov.hmcts.reform.sendletter.model.in.BlobInfo;
 import uk.gov.hmcts.reform.sendletter.model.in.DeleteBlob;
 import uk.gov.hmcts.reform.sendletter.model.in.PrintResponse;
@@ -24,6 +26,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.google.common.base.Charsets.UTF_8;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -50,28 +53,27 @@ class BlobProcessorTest {
     private BlobStitch blobStitch;
     @Mock
     private BlobDelete blobDelete;
-
     @Mock
     private BlobClient blobClient;
-    private BlobInfo blobInfo;
-
 
     @BeforeEach
     void setUp() {
-
-        blobInfo = new BlobInfo(blobClient);
-        blobInfo.setLeaseId("LEASE_ID");
-        blobInfo.setContainerName(TEST_NEW_CONTAINER);
-        blobInfo.setServiceName(TEST_NEW_SERVICE);
-
-        blobProcessor = new BlobProcessor(blobReader, blobBackup, blobStitch, blobDelete);
-
-        given(blobReader.retrieveBlobToProcess())
-                .willReturn(Optional.of(blobInfo));
+        blobProcessor = new BlobProcessor(blobReader,
+                blobBackup,
+                blobStitch,
+                blobDelete);
     }
 
     @Test
     void should_process_blob_when_triggered() throws IOException {
+        BlobInfo blobInfo = new BlobInfo(blobClient);
+        blobInfo.setLeaseId("LEASE_ID");
+        blobInfo.setContainerName(TEST_NEW_CONTAINER);
+        blobInfo.setServiceName(TEST_NEW_SERVICE);
+
+        given(blobReader.retrieveBlobToProcess())
+                .willReturn(Optional.of(blobInfo));
+
         var objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         var json = StreamUtils.copyToString(
@@ -102,5 +104,34 @@ class BlobProcessorTest {
                 .willReturn(Optional.empty());
         blobProcessor.read();
         verify(blobManager, never()).getContainerClient(anyString());
+    }
+
+    @Test
+    void should_throw_expection_when_leaseId_absent() throws IOException {
+
+        BlobInfo blobInfo = new BlobInfo(blobClient);
+        blobInfo.setContainerName(TEST_NEW_CONTAINER);
+        blobInfo.setServiceName(TEST_NEW_SERVICE);
+
+        given(blobReader.retrieveBlobToProcess())
+                .willReturn(Optional.of(blobInfo));
+
+        var objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        var json = StreamUtils.copyToString(
+                new ClassPathResource("print_job_response.json").getInputStream(), UTF_8);
+        var printResponse = objectMapper.readValue(json, PrintResponse.class);
+        given(blobClient.getBlobName()).willReturn(TEST_BLOB_NAME);
+        given(blobBackup.backupBlobs(blobInfo)).willReturn(printResponse);
+
+        var deleteBlob = new DeleteBlob();
+        deleteBlob.setBlobName(List.of(TEST_PDF_1, TEST_PDF_2));
+        deleteBlob.setContainerName(TEST_NEW_CONTAINER);
+        deleteBlob.setServiceName(TEST_NEW_SERVICE);
+        given(blobStitch.stitchBlobs(printResponse)).willReturn(deleteBlob);
+
+        assertThatThrownBy(() -> blobProcessor.read())
+                .isInstanceOfAny(LeaseIdNotPresentException.class, BlobProcessException.class)
+                .hasMessage("Exception processing blob manifest-/print_job_response.json");
     }
 }

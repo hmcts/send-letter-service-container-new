@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.sendletter.blob.component.BlobBackup;
 import uk.gov.hmcts.reform.sendletter.blob.component.BlobDelete;
 import uk.gov.hmcts.reform.sendletter.blob.component.BlobReader;
 import uk.gov.hmcts.reform.sendletter.blob.component.BlobStitch;
+import uk.gov.hmcts.reform.sendletter.exceptions.BlobProcessException;
 import uk.gov.hmcts.reform.sendletter.exceptions.LeaseIdNotPresentException;
 import uk.gov.hmcts.reform.sendletter.model.in.BlobInfo;
 
@@ -61,7 +62,8 @@ public class BlobProcessor {
             status = blobDelete.deleteOriginalBlobs(deleteBlob);
             LOG.info("BlobProcessor:: delete original blobs");
         } catch (Exception e) {
-            LOG.error("Exception processing blob {}", blobInfo.getBlobClient().getBlobName(), e);
+            throw new BlobProcessException(String.format("Exception processing blob %s",
+                    blobInfo.getBlobClient().getBlobName()), e);
         }
         return status;
     }
