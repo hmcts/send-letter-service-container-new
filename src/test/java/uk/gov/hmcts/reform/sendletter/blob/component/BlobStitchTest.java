@@ -128,10 +128,13 @@ class BlobStitchTest {
     }
 
     static String[] stringArrayProvider() {
-        return new String[] {"print_job_response_document_is_null.json",
+        return new String[] {
+            "print_job_response_document_is_null.json",
             "print_job_upload_info_is_null.json",
             "print_job_upload_to_container_is_null.json",
-            "print_job_is_null.json"};
+            "print_job_is_null.json",
+            "print_job_response_service_is_null.json"
+        };
     }
 
     private void createAccessTokenConfig() {
