@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sendletter.blob.component;
 
-import com.azure.storage.blob.models.BlobStorageException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +46,9 @@ public class BlobBackup2 {
                 byte[] bytes = blobInputStream.readAllBytes();
                 printResponse = mapper.readValue(bytes, PrintResponse.class);
 
-                if (printResponse != null && printResponse.printJob != null && printResponse.printJob.documents != null) {
+                if (printResponse != null
+                        && printResponse.printJob != null
+                        && printResponse.printJob.documents != null) {
 
                     var sourceSasToken = sasTokenGeneratorService.generateSasToken(serviceName);
                     var destSasToken = sasTokenGeneratorService.generateSasToken("send_letter_backup");

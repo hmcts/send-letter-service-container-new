@@ -52,12 +52,25 @@ class BlobBackup2Test {
     @Mock
     private SasTokenGeneratorService sasTokenGeneratorService;
     @Mock
-    private BlobInputStream blobInputStream, blobInputStream1, blobInputStream2;
+    private BlobInputStream blobInputStream;
+    @Mock
+    private BlobInputStream blobInputStream1;
+    @Mock
+    private BlobInputStream blobInputStream2;
     @Mock
     private PrintResponse printResponse;
     @Mock
-    private BlobClient blobClient,blobClient1,blobClient2,
-            destBlobClient,destBlobClient1,destBlobClient2;
+    private BlobClient blobClient;
+    @Mock
+    private BlobClient blobClient1;
+    @Mock
+    private BlobClient blobClient2;
+    @Mock
+    private BlobClient destBlobClient;
+    @Mock
+    private BlobClient destBlobClient1;
+    @Mock
+    private BlobClient destBlobClient2;
 
     private AccessTokenProperties accessTokenProperties;
     private BlobBackup2 blobBackup;
@@ -102,8 +115,8 @@ class BlobBackup2Test {
         given(blobInputStream1.readAllBytes()).willReturn("pdf1".getBytes());
         given(blobInputStream2.readAllBytes()).willReturn("pdf2".getBytes());
 
-        lenient().when(mapper.readValue(new ByteArrayInputStream(json.getBytes())
-                , PrintResponse.class)).thenReturn(printResponse);
+        lenient().when(mapper.readValue(new ByteArrayInputStream(json.getBytes()),
+                PrintResponse.class)).thenReturn(printResponse);
 
         given(sasTokenGeneratorService.generateSasToken(TEST_NEW_SERVICE))
                 .willReturn(sasToken);
@@ -171,11 +184,11 @@ class BlobBackup2Test {
 
         given(blobInputStream.readAllBytes()).willReturn(json.getBytes());
         given(blobInputStream1.readAllBytes()).willReturn("pdf1".getBytes());
-        given(blobInputStream2.readAllBytes()).
-                willThrow(new RuntimeException("The specified blob does not exist."));
+        given(blobInputStream2.readAllBytes())
+                .willThrow(new RuntimeException("The specified blob does not exist."));
 
-        lenient().when(mapper.readValue(new ByteArrayInputStream(json.getBytes())
-                , PrintResponse.class)).thenReturn(printResponse);
+        lenient().when(mapper.readValue(new ByteArrayInputStream(json.getBytes()),
+                PrintResponse.class)).thenReturn(printResponse);
 
         given(sasTokenGeneratorService.generateSasToken(TEST_NEW_SERVICE))
                 .willReturn(sasToken);

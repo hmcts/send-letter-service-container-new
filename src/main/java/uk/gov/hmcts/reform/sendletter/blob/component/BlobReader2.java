@@ -34,9 +34,9 @@ public class BlobReader2 {
 
     public Optional<BlobInfo> retrieveBlobToProcess() {
         LOG.info("About to read manifests details from new container");
-        var containers = accessTokenProperties.getServiceConfig().stream().
-                filter(t -> t.getContainerName().startsWith("new-")).
-                collect(Collectors.toList());
+        var containers = accessTokenProperties.getServiceConfig().stream()
+                .filter(t -> t.getContainerName().startsWith("new-"))
+                .collect(Collectors.toList());
         Collections.shuffle(containers);
         var counter = 0;
 

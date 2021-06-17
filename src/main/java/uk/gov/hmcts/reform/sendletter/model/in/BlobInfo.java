@@ -36,6 +36,7 @@ public class BlobInfo {
     public String getContainerName() {
         return containerName.orElse("invalid container");
     }
+
     public void setContainerName(String containerName) {
         this.containerName = Optional.ofNullable(containerName);
     }

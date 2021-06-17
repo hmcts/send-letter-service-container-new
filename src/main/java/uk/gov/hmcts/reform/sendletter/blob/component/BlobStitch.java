@@ -2,8 +2,8 @@ package uk.gov.hmcts.reform.sendletter.blob.component;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.sendletter.config.AccessTokenProperties;
 import uk.gov.hmcts.reform.sendletter.model.in.DeleteBlob;
 import uk.gov.hmcts.reform.sendletter.model.in.Doc;
 import uk.gov.hmcts.reform.sendletter.model.in.Document;
@@ -30,11 +30,12 @@ public class BlobStitch {
     public BlobStitch(BlobManager blobManager,
             SasTokenGeneratorService sasTokenGeneratorService,
             PdfCreator pdfCreator,
-            @Value("${storage.backup-container}") String processedContainer) {
+            AccessTokenProperties accessTokenProperties) {
         this.blobManager = blobManager;
         this.sasTokenGeneratorService = sasTokenGeneratorService;
         this.pdfCreator = pdfCreator;
-        this.processedContainer = processedContainer;
+        this.processedContainer = accessTokenProperties
+                .getContainerForGivenService("send_letter_process");
     }
 
     public DeleteBlob stitchBlobs(PrintResponse printResponse) throws IOException {
@@ -65,11 +66,11 @@ public class BlobStitch {
 
             var finalPdfName = generatePdfName(printResponse.printJob.type, serviceName,
                     printResponse.printJob.id);
-            byte[] fromBase64PdfWithCopies = pdfCreator.createFromBase64PdfWithCopies(docs);
 
-            // Create final pdf file from byte[] .e.g stitched
+            byte[] fromBase64PdfWithCopies = pdfCreator.createFromBase64PdfWithCopies(docs);
             try (var targetStream = new ByteArrayInputStream(fromBase64PdfWithCopies)) {
-                var blobClient = blobManager.getBlobClient(processedContainer, sasToken, finalPdfName);
+                var destSasToken = sasTokenGeneratorService.generateSasToken("send_letter_process");
+                var blobClient = blobManager.getBlobClient(processedContainer, destSasToken, finalPdfName);
                 blobClient.upload(targetStream, fromBase64PdfWithCopies.length);
                 LOG.info("Uploaded blob {} to Blob storage completed.", blobClient.getBlobUrl());
             }
@@ -81,8 +82,8 @@ public class BlobStitch {
         var fileName = document.uploadToPath;
         var sourceBlobClient = blobManager.getBlobClient(containerName, sasToken, fileName);
 
-        try (var data = sourceBlobClient.openInputStream()) {
-            byte[] bytes = data.readAllBytes();
+        try (var blobInputStream = sourceBlobClient.openInputStream()) {
+            byte[] bytes = blobInputStream.readAllBytes();
             return new Doc(bytes, document.copies);
         }
     }
