@@ -1,17 +1,16 @@
 package uk.gov.hmcts.reform.sendletter.blob.component;
 
-import com.azure.storage.blob.models.BlobItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.sendletter.blob.storage.LeaseClientProvider;
 import uk.gov.hmcts.reform.sendletter.config.AccessTokenProperties;
-import uk.gov.hmcts.reform.sendletter.model.in.ManifestBlobInfo;
+import uk.gov.hmcts.reform.sendletter.model.in.BlobInfo;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
-
-import static java.util.stream.Collectors.toList;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 public class BlobReader {
@@ -20,38 +19,61 @@ public class BlobReader {
 
     private final BlobManager blobManager;
     private final AccessTokenProperties accessTokenProperties;
+    private final LeaseClientProvider leaseClientProvider;
+    private final int leaseTime;
 
-    public BlobReader(BlobManager blobManager, AccessTokenProperties accessTokenProperties) {
+    public BlobReader(BlobManager blobManager,
+            AccessTokenProperties accessTokenProperties,
+            LeaseClientProvider leaseClientProvider,
+            @Value("${storage.leaseTime}") int leaseTime) {
         this.blobManager =  blobManager;
         this.accessTokenProperties = accessTokenProperties;
+        this.leaseClientProvider = leaseClientProvider;
+        this.leaseTime = leaseTime;
     }
 
-    public List<ManifestBlobInfo> retrieveManifestsToProcess() {
-        LOG.info("About to read manifests details");
-        var containers = new ArrayList<>(accessTokenProperties.getServiceConfig());
+    public Optional<BlobInfo> retrieveBlobToProcess() {
+        LOG.info("About to read manifests details from new container");
+        var containers = accessTokenProperties.getServiceConfig().stream()
+                .filter(t -> t.getContainerName().startsWith("new-"))
+                .collect(Collectors.toList());
         Collections.shuffle(containers);
         var counter = 0;
-        List<ManifestBlobInfo> manifestBlobList = Collections.emptyList();
 
-        while (manifestBlobList.isEmpty()
-                && counter < containers.size()) {
+        Optional<BlobInfo> manifest = Optional.empty();
+        while (manifest.isEmpty() && counter < containers.size()) {
             var tokenConfig = containers.get(counter++);
-            String serviceName = tokenConfig.getServiceName();
-            String containerName = tokenConfig.getContainerName();
-
+            var containerName = tokenConfig.getContainerName();
+            var serviceName = tokenConfig.getServiceName();
             var containerClient = blobManager.getContainerClient(containerName);
 
-            manifestBlobList = containerClient.listBlobs().stream()
-                    .map(BlobItem::getName)
-                    .filter(fileName -> fileName.startsWith("manifest"))
-                    .map(fileName ->
-                            new ManifestBlobInfo(
-                                    serviceName,
-                                    containerName,
-                                    fileName)
+            manifest = containerClient.listBlobs().stream()
+                    .filter(blobItem -> blobItem.getName().startsWith("manifest"))
+                    .map(blobItem ->
+                            new BlobInfo(
+                                    containerClient.getBlobClient(blobItem.getName())
+                            )
                     )
-                    .collect(toList());
+                    .filter(blobInfo -> {
+                        this.acquireLease(blobInfo, containerName, serviceName);
+                        return blobInfo.isLeased();
+                    })
+                    .findFirst();
         }
-        return manifestBlobList;
+        return manifest;
+    }
+
+    private void acquireLease(BlobInfo blobInfo, String containerName, String serviceName) {
+        try {
+            var blobLeaseClient = leaseClientProvider.get(blobInfo.getBlobClient());
+            var leaseId = blobLeaseClient.acquireLease(leaseTime);
+            blobInfo.setLeaseId(leaseId);
+            blobInfo.setContainerName(containerName);
+            blobInfo.setServiceName(serviceName);
+        } catch (Exception e) {
+            LOG.error("Unable to acquire lease for blob {}",
+                    blobInfo.getBlobClient().getBlobName(),
+                    e);
+        }
     }
 }
