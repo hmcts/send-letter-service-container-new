@@ -4,7 +4,7 @@ plugins {
   id 'pmd'
   id 'jacoco'
   id 'io.spring.dependency-management' version '1.0.11.RELEASE'
-  id 'org.springframework.boot' version '2.4.4'
+  id 'org.springframework.boot' version '2.5.1'
   id 'org.owasp.dependencycheck' version '6.1.5'
   id 'com.github.ben-manes.versions' version '0.38.0'
   id 'org.sonarqube' version '3.1.1'
@@ -186,15 +186,6 @@ dependencyManagement {
       entry 'netty-resolver-dns'
       entry 'netty-resolver-dns-native-macos'
     }
-    // CVE-2021-22118
-    dependencySet(group: 'org.springframework', version: '5.3.7') {
-      entry 'spring-aop'
-      entry 'spring-beans'
-      entry 'spring-context'
-      entry 'spring-core'
-      entry 'spring-expression'
-      entry 'spring-jcl'
-    }
   }
 }
 
@@ -233,7 +224,8 @@ dependencies {
   implementation group: 'uk.gov.hmcts.reform', name: 'logging', version: versions.reformLogging
   implementation group: 'uk.gov.hmcts.reform', name: 'logging-appinsights', version: versions.reformLogging
 
-  implementation group: 'com.azure', name: 'azure-storage-blob', version: '12.10.2'
+  implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-bootstrap', version: '3.0.3'
+  implementation group: 'com.azure', name: 'azure-storage-blob', version: '12.11.1'
 
   implementation group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
   implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger

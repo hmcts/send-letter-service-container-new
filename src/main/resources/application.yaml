@@ -1,3 +1,16 @@
+management:
+  endpoint:
+    health:
+      show-details: "always"
+  endpoints:
+    web:
+      base-path: /
+      exposure:
+        include: health, info
+  health:
+    mail:
+      enabled: false
+
 spring:
   application:
     name: Send Letter Service Container New
@@ -8,7 +21,7 @@ spring:
 
 storage:
   connection: ${STORAGE_ACCOUNT_CONNECTION_STRING}
-  leaseTime: ${BLOB_LEASE_TIME:20} #In seconds
+  leaseTime: ${BLOB_LEASE_TIME:30} #In seconds
 
 accesstoken:
   serviceConfig:
