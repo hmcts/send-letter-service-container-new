@@ -42,8 +42,10 @@ public class BlobReader {
 
         Optional<BlobInfo> manifest = Optional.empty();
         while (manifest.isEmpty() && counter < containers.size()) {
+            LOG.info("Picked index {}", counter);
             var tokenConfig = containers.get(counter++);
             var containerName = tokenConfig.getContainerName();
+            LOG.info("Picked container {}", containerName);
             var serviceName = tokenConfig.getServiceName();
             var containerClient = blobManager.getContainerClient(containerName);
 
