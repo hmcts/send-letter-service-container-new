@@ -5,6 +5,7 @@
     <BuiltIn enabled="true">
       <HTTP enabled="true"/>
       <JDBC enabled="true"/>
+      <Logging enabled="false" /><!-- So to capture logging in hmcts way -->
     </BuiltIn>
   </Instrumentation>
 </ApplicationInsightsAgent>
