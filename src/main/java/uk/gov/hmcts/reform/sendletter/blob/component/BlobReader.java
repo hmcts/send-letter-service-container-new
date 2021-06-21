@@ -45,8 +45,8 @@ public class BlobReader {
             LOG.info("Picked index {}", counter);
             var tokenConfig = containers.get(counter++);
             var containerName = tokenConfig.getContainerName();
-            LOG.info("Picked container {}", containerName);
             var serviceName = tokenConfig.getServiceName();
+            LOG.info("Picked container {} service {}", containerName, serviceName);
             var containerClient = blobManager.getContainerClient(containerName);
 
             manifest = containerClient.listBlobs().stream()
