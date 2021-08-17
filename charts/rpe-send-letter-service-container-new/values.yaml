@@ -14,6 +14,8 @@ function:
   job:
     activeDeadlineSeconds: 300
     ttlSecondsAfterFinished: 600
+    parallelism: 5
+    completions: 5
   triggerAuth:
     enabled: true
   triggers:
