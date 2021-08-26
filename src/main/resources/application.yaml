@@ -25,22 +25,22 @@ storage:
 
 accesstoken:
   serviceConfig:
-    - serviceName: cmc
+    - serviceName: cmc_claim_store
       containerName: new-cmc
       validity: ${SAS_TOKEN_VALIDITY:300} #In seconds
-    - serviceName: divorce
+    - serviceName: divorce_frontend
       containerName: new-divorce
       validity: ${SAS_TOKEN_VALIDITY:300} #In seconds
-    - serviceName: finrem
+    - serviceName: finrem_document_generator
       containerName: new-finrem
       validity: ${SAS_TOKEN_VALIDITY:300} #In seconds
-    - serviceName: fpl
+    - serviceName: fpl_case_service
       containerName: new-fpl
       validity: ${SAS_TOKEN_VALIDITY:300} #In seconds`
     - serviceName: nfdiv_case_api
       containerName: new-nfdivorce
       validity: ${SAS_TOKEN_VALIDITY:300} #In seconds
-    - serviceName: probate
+    - serviceName: probate_backend
       containerName: new-probate
       validity: ${SAS_TOKEN_VALIDITY:300} #In seconds
     - serviceName: sscs
