@@ -1,2 +1,7 @@
 function:
   image: ${IMAGE_NAME}
+  triggers:
+    - type: azure-blob
+      blobContainerName: "new-bulkprint"
+      accountName: "rpesendletter{{ .Values.global.environment }}"
+      blobPrefix: manifest-
