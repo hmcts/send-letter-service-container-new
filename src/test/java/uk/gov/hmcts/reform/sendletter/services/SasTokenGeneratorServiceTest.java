@@ -58,7 +58,6 @@ class SasTokenGeneratorServiceTest {
 
         assertThat(queryParams.get("sig")).isNotNull();//this is a generated hash of the resource string
         assertThat(queryParams.get("se")).startsWith(currentDate);//the expiry date/time for the signature
-        assertThat(queryParams.get("sv")).contains("2020-06-12");//azure api version is latest
         assertThat(queryParams.get("sp")).contains("rwdl");//access permissions(write-w,list-l)
     }
 
