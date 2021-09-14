@@ -11,7 +11,7 @@ plugins {
 }
 
 group = 'uk.gov.hmcts.reform'
-version = '0.0.1'
+version = '0.1.0'
 
 allprojects {
   sourceCompatibility = '11'
@@ -198,7 +198,7 @@ repositories {
 
 def versions = [
   junit           : '5.8.0',
-  junitPlatform   : '1.7.2',
+  junitPlatform   : '1.8.0',
   springfoxSwagger: '2.9.2',
   mockitoJupiter  : '3.3.3',
   reformLogging   : '5.1.7'
@@ -215,9 +215,7 @@ ext.libraries = [
 ]
 
 dependencies {
-  def withoutJunit4 = {
-    exclude group: 'junit', module: 'junit'
-  }
+
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
   implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '11.6'
@@ -229,18 +227,11 @@ dependencies {
 
   implementation group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
   implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger
-
   implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: '2.0.24'
 
   implementation group: 'com.github.hmcts.rpe-pdf-service', name: 'pdf-generator', version:'1.0.2'
-
-  testImplementation libraries.junit5
-  testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', {
-    exclude group: 'junit', module: 'junit'
-    exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
-  }
-
-  testImplementation group: 'org.apache.pdfbox', name: 'preflight', version: '2.0.24', withoutJunit4
+  testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
+  testImplementation group: 'org.apache.pdfbox', name: 'preflight', version: '2.0.24'
 
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath
