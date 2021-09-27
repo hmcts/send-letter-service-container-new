@@ -74,8 +74,7 @@ public class BlobReader {
             blobInfo.setServiceName(serviceName);
         } catch (Exception e) {
             LOG.error("Unable to acquire lease for blob {}",
-                    blobInfo.getBlobClient().getBlobName(),
-                    e);
+                    blobInfo.getBlobClient().getBlobName());
         }
     }
 }
