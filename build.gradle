@@ -103,9 +103,9 @@ pmd {
 jacocoTestReport {
   executionData(test, integration)
   reports {
-    xml.enabled = true
-    csv.enabled = false
-    xml.destination = file("${buildDir}/reports/jacoco/test/jacocoTestReport.xml")
+    xml.required = true
+    csv.required = false
+    xml.outputLocation = file("${buildDir}/reports/jacoco/test/jacocoTestReport.xml")
   }
   afterEvaluate {
     getClassDirectories().from = getClassDirectories().files.collect {
@@ -193,7 +193,6 @@ repositories {
   mavenLocal()
   mavenCentral()
   maven { url 'https://jitpack.io' }
-  jcenter()
 }
 
 def versions = [
@@ -219,8 +218,8 @@ dependencies {
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
   implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '11.6'
-  implementation group: 'uk.gov.hmcts.reform', name: 'logging', version: versions.reformLogging
-  implementation group: 'uk.gov.hmcts.reform', name: 'logging-appinsights', version: versions.reformLogging
+  implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: versions.reformLogging
+  implementation group: 'com.github.hmcts.java-logging', name: 'logging-appinsights', version: versions.reformLogging
 
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-bootstrap', version: '3.0.4'
   implementation group: 'com.azure', name: 'azure-storage-blob', version: '12.13.0'
