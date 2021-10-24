@@ -186,6 +186,10 @@ dependencyManagement {
       entry 'netty-resolver-dns'
       entry 'netty-resolver-dns-native-macos'
     }
+     
+    dependencySet(group: 'io.netty.incubator', version: '0.0.19.Final') {
+      entry 'netty-incubator-codec-quic' 
+    }
   }
 }
 
