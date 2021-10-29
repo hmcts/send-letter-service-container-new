@@ -227,7 +227,7 @@ dependencies {
   implementation group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
   implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger
   implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: '2.0.24'
-  implementation group: 'io.netty.incubator', name: 'netty-incubator-codec-quic', version: '0.0.19.Final'
+  implementation group: 'io.netty.incubator', name: 'netty-incubator-codec-quic', version: '0.0.18.Final'
 
   implementation group: 'com.github.hmcts.rpe-pdf-service', name: 'pdf-generator', version:'1.0.2'
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
