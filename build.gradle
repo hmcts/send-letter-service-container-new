@@ -162,6 +162,7 @@ dependencyCheck {
 
 dependencyManagement {
   dependencies {
+    dependency group: 'io.netty.incubator', name: 'netty-incubator-codec-quic', version: '0.0.19.Final'
     dependency group: 'org.bouncycastle', name: 'bcpkix-jdk15on', version: '1.69'
     // CVE-2018-10237 - Unbounded memory allocation
     dependencySet(group: 'com.google.guava', version: '31.0.1-jre') {
@@ -215,9 +216,7 @@ ext.libraries = [
 
 dependencies {
 
-  implementation group: 'org.springframework.boot', name: 'spring-boot-starter', {
-    exclude group: 'io.netty.incubator', module: 'netty-incubator-codec-quic'
-  }
+  implementation group: 'org.springframework.boot', name: 'spring-boot-starter'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
   implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '11.6'
   implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: versions.reformLogging
