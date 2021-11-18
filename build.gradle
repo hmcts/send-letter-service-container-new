@@ -197,7 +197,7 @@ dependencyManagement {
       entry 'spring-jcl'
     }
 
-    dependencySet(group: 'io.netty.incubator', version: '0.0.18.Final') {
+    dependencySet(group: 'io.netty.incubator', version: '0.0.20.Final') {
       entry 'netty-incubator-codec-quic'
     }
   }
