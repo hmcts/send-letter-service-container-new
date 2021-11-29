@@ -210,7 +210,7 @@ repositories {
 }
 
 def versions = [
-  junit           : '5.8.1',
+  junit           : '5.8.2',
   junitPlatform   : '1.8.1',
   springfoxSwagger: '2.9.2',
   mockitoJupiter  : '3.3.3',
