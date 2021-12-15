@@ -200,6 +200,11 @@ dependencyManagement {
     dependencySet(group: 'io.netty.incubator', version: '0.0.20.Final') {
       entry 'netty-incubator-codec-quic'
     }
+
+    dependencySet(group: 'org.apache.logging.log4j', version: '2.16.0') {
+      entry 'log4j-api'
+      entry 'log4j-to-slf4j'
+    }
   }
 }
 
