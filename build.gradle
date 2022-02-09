@@ -168,7 +168,7 @@ dependencyManagement {
       entry 'guava'
     }
 
-    dependencySet(group: 'io.netty', version: '4.1.70.Final') {
+    dependencySet(group: 'io.netty', version: '4.1.74.Final') {
       entry 'netty-buffer'
       entry 'netty-codec'
       entry 'netty-codec-http'
