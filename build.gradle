@@ -258,7 +258,7 @@ dependencies {
   implementation group: 'com.github.hmcts.java-logging', name: 'logging-appinsights', version: versions.reformLogging
 
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-bootstrap', version: '3.1.0'
-  implementation group: 'com.azure', name: 'azure-storage-blob', version: '12.14.2'
+  implementation group: 'com.azure', name: 'azure-storage-blob', version: '12.14.4'
 
   implementation group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
   implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger
