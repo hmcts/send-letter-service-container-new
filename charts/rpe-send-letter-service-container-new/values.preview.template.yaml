@@ -3,5 +3,6 @@ function:
   image: ${IMAGE_NAME}
   triggers:
     - type: azure-blob
-      blobContainerName: "new"
-      accountName: "rpesendletterpreview"
+      blobContainerName: "new-preview"
+      accountName: "rpesendletteraat"
+      blobPrefix: manifest-
