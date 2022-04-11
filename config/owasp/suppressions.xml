@@ -121,5 +121,6 @@
     </suppress>
     <suppress until="2022-07-05">
         <cve>CVE-2022-22965</cve>
+        <cve>CVE-2022-22950</cve>
     </suppress>
 </suppressions>
