@@ -187,14 +187,15 @@ dependencyManagement {
       entry 'netty-resolver-dns-native-macos'
     }
 
-    //CVE-2021-22096
-    dependencySet(group: 'org.springframework', version: '5.3.13') {
+    // CVE-2022-22950
+    dependencySet(group: 'org.springframework', version: '5.3.18') {
       entry 'spring-aop'
       entry 'spring-beans'
       entry 'spring-context'
       entry 'spring-core'
       entry 'spring-expression'
       entry 'spring-jcl'
+      entry 'sspring-test'
     }
 
     dependencySet(group: 'io.netty.incubator', version: '0.0.20.Final') {
