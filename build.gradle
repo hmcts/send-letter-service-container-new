@@ -167,10 +167,11 @@ dependencyManagement {
     dependencySet(group: 'com.google.guava', version: '31.0.1-jre') {
       entry 'guava'
     }
-
-    dependencySet(group: 'io.netty', version: '4.1.70.Final') {
+    //CVE-2022-24823
+    dependencySet(group: 'io.netty', version: '4.1.77.Final') {
       entry 'netty-buffer'
       entry 'netty-codec'
+      entry 'netty-codec-dns'
       entry 'netty-codec-http'
       entry 'netty-codec-http2'
       entry 'netty-codec-socks'
@@ -178,13 +179,15 @@ dependencyManagement {
       entry 'netty-handler'
       entry 'netty-handler-proxy'
       entry 'netty-resolver'
+      entry 'netty-resolver-dns'
+      entry 'netty-resolver-dns-classes-macos'
+      entry 'netty-resolver-dns-native-macos'
       entry 'netty-transport'
+      entry 'netty-transport-classes-epoll'
+      entry 'netty-transport-classes-kqueue'
       entry 'netty-transport-native-epoll'
       entry 'netty-transport-native-kqueue'
       entry 'netty-transport-native-unix-common'
-      entry 'netty-codec-dns'
-      entry 'netty-resolver-dns'
-      entry 'netty-resolver-dns-native-macos'
     }
 
     dependencySet(group: 'io.netty.incubator', version: '0.0.20.Final') {
