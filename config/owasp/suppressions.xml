@@ -122,7 +122,7 @@
         <cve>CVE-2016-1000027</cve>
         <cve>CVE-2022-22968</cve>
     </suppress>
-    <suppress>
+    <suppress until="2022-09-06">
         <cve>CVE-2022-22976</cve>
     </suppress>
 </suppressions>
