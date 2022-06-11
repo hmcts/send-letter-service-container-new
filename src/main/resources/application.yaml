@@ -44,7 +44,7 @@ accesstoken:
       containerName: new-probate
       validity: ${SAS_TOKEN_VALIDITY:300} #In seconds
     - serviceName: sscs
-      containerName: new-sscs
+      containerName: new-preview
       validity: ${SAS_TOKEN_VALIDITY:300} #In seconds
     - serviceName: send_letter_tests
       containerName: new-bulkprint
