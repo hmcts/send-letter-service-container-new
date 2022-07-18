@@ -112,11 +112,6 @@
         <packageUrl regex="true">^pkg:maven/io\.netty/netty\-transport\-native\-unix\-common@.*$</packageUrl>
         <cve>CVE-2021-43797</cve>
     </suppress>
-    <suppress until="2022-07-05">
-        <cve>CVE-2013-4152</cve>
-        <cve>CVE-2013-7315</cve>
-        <cve>CVE-2014-0054</cve>
-    </suppress>
     <suppress until="2022-07-22">
         <cve>CVE-2022-22965</cve>
         <cve>CVE-2016-1000027</cve>
@@ -128,5 +123,8 @@
     </suppress>
     <suppress until="2022-10-01">
         <cve>CVE-2022-33915</cve>
+    </suppress>
+    <suppress until="2022-10-18">
+        <cve>CVE-2022-31569</cve>
     </suppress>
 </suppressions>
