@@ -247,7 +247,7 @@ dependencies {
 
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
-  implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '11.8'
+  implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '11.9.1'
   implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: versions.reformLogging
   implementation group: 'com.github.hmcts.java-logging', name: 'logging-appinsights', version: versions.reformLogging
 
