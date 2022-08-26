@@ -1,0 +1,18 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: "send-letter-service-container-new"
+  annotations:
+    # This must match folder-name/job-name in Jenkins.
+    jenkins.io/job-full-name: cft:HMCTS_j_to_z/send-letter-service-container-new
+    github.com/project-slug: hmcts/send-letter-service-container-new
+  tags:
+    - java
+  links:
+    - url: https://hmcts-reform.slack.com/app_redirect?channel=rbs
+      title: "#rbs on Slack"
+      icon: chat
+spec:
+  type: service
+  lifecycle: production
+  owner: dcd_group_bulkscan_v2
