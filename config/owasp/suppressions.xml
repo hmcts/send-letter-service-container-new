@@ -1,11 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
-    <suppress until="2022-10-22">
-        <cve>CVE-2016-1000027</cve>
-    </suppress>
-    <suppress until="2022-10-18">
-        <cve>CVE-2022-31569</cve>
-    </suppress>
     <suppress until="2022-12-09">
         <cve>CVE-2022-25857</cve>
         <cve>CVE-2022-38749</cve>
@@ -30,5 +24,10 @@
     <suppress until="2023-01-12">
         <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson\-databind@.*$</packageUrl>
         <cve>CVE-2022-42003</cve>
+    </suppress>
+    <suppress until="2023-01-07">
+        <notes>spring-security 2.7.2 has new vulnerabilities, fixed in version 2.7.5 but springboot currently uses 2.7.2</notes>
+        <cve>CVE-2022-31692</cve>
+        <cve>CVE-2022-31690</cve>
     </suppress>
 </suppressions>
