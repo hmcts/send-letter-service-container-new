@@ -234,7 +234,7 @@ def versions = [
   junitPlatform   : '1.9.1',
   springfoxSwagger: '2.9.2',
   mockitoJupiter  : '3.3.3',
-  reformLogging   : '5.1.7'
+  reformLogging   : '6.0.1'
 ]
 
 ext.libraries = [
