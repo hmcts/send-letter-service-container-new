@@ -13,7 +13,7 @@
         <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-crypto@.*$</packageUrl>
         <vulnerabilityName>CVE-2020-5408</vulnerabilityName>
     </suppress>
-    <suppress until="2022-12-06">
+    <suppress until="2023-03-06">
         <notes><![CDATA[
    file name: spring-security-rsa-1.0.11.RELEASE.jar
    ]]></notes>
@@ -29,5 +29,9 @@
         <notes>spring-security 2.7.2 has new vulnerabilities, fixed in version 2.7.5 but springboot currently uses 2.7.2</notes>
         <cve>CVE-2022-31692</cve>
         <cve>CVE-2022-31690</cve>
+    </suppress>
+    <suppress until="2023-03-08">
+        <notes>apache-commons vulnerability</notes>
+        <cve>CVE-2021-37533</cve>
     </suppress>
 </suppressions>
