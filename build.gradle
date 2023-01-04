@@ -195,7 +195,7 @@ dependencyManagement {
     }
 
     // CVE-2021-22044
-    dependencySet(group: 'org.springframework.cloud', version: '3.1.5') {
+    dependencySet(group: 'org.springframework.cloud', version: '4.0.0') {
       entry 'spring-cloud-starter-openfeign'
     }
     // CVE-2014-3488 CVE-2015-2156
@@ -255,7 +255,7 @@ dependencies {
   implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: versions.reformLogging
   implementation group: 'com.github.hmcts.java-logging', name: 'logging-appinsights', version: versions.reformLogging
 
-  implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-bootstrap', version: '3.1.5'
+  implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-bootstrap', version: '4.0.0'
   implementation group: 'com.azure', name: 'azure-storage-blob', version: '12.20.1'
 
   implementation group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
